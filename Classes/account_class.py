@@ -121,13 +121,13 @@ class Account:
         for a in name:
             name_proper += a + " "
         data_list.insert(1, name_proper)
-        data_list.insert(3, LANGUAGE_DICT['annual_revenue'])
+        data_list.insert(3, LANGUAGE_DICT['global_revenue'])
         data_list.insert(4, self.Revenues)
         data_list.insert(7, LANGUAGE_DICT['initial_balance'])
         data_list.insert(8, self.Initial_Balance)
         worksheet.append(data_list)
         data_list = ["" for i in range(nb_col-4)]
-        data_list.insert(3, LANGUAGE_DICT['annual_expense'])
+        data_list.insert(3, LANGUAGE_DICT['global_expense'])
         data_list.insert(4, self.Expenses)
         data_list.insert(7, LANGUAGE_DICT['actual_balance'])
         data_list.insert(8, self.Balance)
@@ -182,7 +182,7 @@ class Account:
                 list_category.append(tot_tot)
                 worksheet.append(list_category)
                 len_table_vertical += 1
-        return len_table_horizontal, len_table_vertical    
+        return len_table_horizontal, len_table_vertical
     
     def get_name(self):
         return self.Name
