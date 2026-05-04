@@ -46,9 +46,9 @@ def apply_worksheet_background(worksheet, max_row = 100, max_col=100):
             cell = worksheet[compute_cell(j,i)]
             cell.fill = pf
 
-def set_columns_size(worksheet, nb_col=20):
+def set_columns_size(worksheet, nb_col=20, column_width=24):
     for j in range(2, nb_col):
-        worksheet.column_dimensions[get_column(j)].width = 24
+        worksheet.column_dimensions[get_column(j)].width = column_width
 
 def apply_case_style(worksheet, row, col):
     background = PatternFill("solid", fgColor="A0A0A0")
@@ -93,7 +93,7 @@ def apply_simple_vertical_table(worksheet, width=2, height=3, start_row=1, start
             else:
                 cell.font = data_font[1]
 
-def worksheet_table_vertical_background(worksheet, width=2, height=3, start_row=1, start_col=1, is_last_total=False, is_last_col_total=False):
+def worksheet_table_vertical_background(worksheet, width=2, height=3, start_row=1, start_col=1, start_col_width=30, col_width=24, is_last_total=False, is_last_col_total=False):
     ## Apply Title Background
     title_background = PatternFill("solid", fgColor="A0A0A0")
     title_font = Font(color="000000", bold=True, size=20)
@@ -109,9 +109,9 @@ def worksheet_table_vertical_background(worksheet, width=2, height=3, start_row=
         cell.font = title_font
         cell.border = title_border
         if (j == start_col):
-            worksheet.column_dimensions[get_column(j)].width = 30
+            worksheet.column_dimensions[get_column(j)].width = start_col_width
         else:
-            worksheet.column_dimensions[get_column(j)].width = 24
+            worksheet.column_dimensions[get_column(j)].width = col_width
     ## Apply Values Background
     data_background = [PatternFill("solid", fgColor="F0F0F0"), PatternFill("solid", fgColor="E0E0E0")]
     data_font = [Font(color="000000", bold=False, size=14), Font(color="000000", bold=True, size=14), Font(color="AA0000", bold=False, size=14), Font(color="00AA00", bold=False, size=14)]
@@ -169,7 +169,7 @@ def worksheet_table_vertical_background(worksheet, width=2, height=3, start_row=
             cell = worksheet[compute_cell(j,start_row+height-1)]
             cell.border = last_border
 
-def worksheet_table_horizontal_background(worksheet, width=2, height=3, start_row=1, start_col=1, is_last_total=0):
+def worksheet_table_horizontal_background(worksheet, width=2, height=3, start_row=1, start_col=1, start_col_width=30, col_width=24, is_last_total=0):
     ## Apply Title Background
     title_background = PatternFill("solid", fgColor="A0A0A0")
     title_font = Font(color="000000", bold=True, size=20)
@@ -185,9 +185,9 @@ def worksheet_table_horizontal_background(worksheet, width=2, height=3, start_ro
         cell.font = title_font
         cell.border = title_border
         if (j == start_col):
-            worksheet.column_dimensions[get_column(j)].width = 30
+            worksheet.column_dimensions[get_column(j)].width = start_col_width
         else:
-            worksheet.column_dimensions[get_column(j)].width = 24
+            worksheet.column_dimensions[get_column(j)].width = col_width
     ## Apply Values Background
     data_background = [PatternFill("solid", fgColor="F0F0F0"), PatternFill("solid", fgColor="E0E0E0")]
     data_font = [Font(color="000000", bold=False, size=14), Font(color="000000", bold=True, size=16), Font(color="AA0000", bold=False, size=14), Font(color="00AA00", bold=False, size=14)]

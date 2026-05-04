@@ -114,6 +114,49 @@ class Account_manager:
         for acc in self.Accounts.keys():
             self.Accounts[acc].generate_yearly(summary_file_type=summary_file_type)
     
+    def fulfill_worksheet(self, worksheet):
+        nb_col = max(len(self.Accounts.keys()), 9)
+        len_table_horizontal = 1
+        worksheet.append(["" for i in range(nb_col)])
+        data_list = ["" for i in range(nb_col-3)]
+        name = LANGUAGE_DICT['account_report'].split('_')
+        name_proper = ""
+        for a in name:
+            name_proper += a + " "
+        data_list.insert(1, name_proper)
+        data_list.insert(3, LANGUAGE_DICT['initial_balance'])
+        data_list.insert(4, self.Initial_total)
+        worksheet.append(data_list)
+        data_list = ["" for i in range(nb_col-2)]
+        data_list.insert(3, LANGUAGE_DICT['actual_balance'])
+        data_list.insert(4, self.Total)
+        worksheet.append(data_list)
+        data_list = ["" for i in range(nb_col-2)]
+        data_list.insert(3, f"{LANGUAGE_DICT['evol']} (%)")
+        data_list.insert(4, (self.Total-self.Initial_total)/self.Initial_total)
+        worksheet.append(data_list)
+        worksheet.append(["" for i in range(nb_col)])
+        list_acc = ["", LANGUAGE_DICT['account']]
+        list_revenus = ["", LANGUAGE_DICT['global_revenue']]
+        list_expense = ["", LANGUAGE_DICT['global_expense']]
+        list_balance = ["", LANGUAGE_DICT['balance']]
+        for a in self.Accounts.keys():
+            acc = self.Accounts[a]
+            name = a.split('_')
+            name_proper = ""
+            for a in name:
+                name_proper += a + " "
+            list_acc.append(name_proper)
+            list_revenus.append(acc.get_revenue())
+            list_expense.append(acc.get_expense())
+            list_balance.append(acc.get_balance())
+            len_table_horizontal += 1
+        worksheet.append(list_acc)
+        worksheet.append(list_revenus)
+        worksheet.append(list_expense)
+        worksheet.append(list_balance)
+        return len_table_horizontal
+    
     def generate_accounts_summary(self, summary_file_type="xlsx"):
         """
         Function that generates complete account specific summary with all available data
@@ -122,6 +165,17 @@ class Account_manager:
         if len(self.Accounts.keys()) != 0:
             summary_file_path = self.Folder_path + "/" + summary_name + "_" + self.Name + "." + summary_file_type
             writer = pd.ExcelWriter(summary_file_path, mode='w', engine='openpyxl')
+            ## Global Account Summary
+            data = pd.DataFrame(index=None, columns=None)
+            data.to_excel(writer, sheet_name=f"{LANGUAGE_DICT['account_report']}", index=False, header=False, float_format="%.2f")
+            worksheet = writer.sheets[f"{LANGUAGE_DICT['account_report']}"]
+            len_table = self.fulfill_worksheet(worksheet)
+            apply_worksheet_background(worksheet)
+            set_columns_size(worksheet, max(20, len_table))
+            apply_case_style(worksheet, row=2, col=2)
+            apply_simple_vertical_table(worksheet, width=2, height=3, start_row=2, start_col=4, is_last_percent=True)
+            worksheet_table_horizontal_background(worksheet, width=len_table, height=4, start_row=6, start_col=2, start_col_width=30, col_width=50, is_last_total=1)
+            ## Write per account yearly summary
             for acc in self.Accounts.keys():
                 account = self.Accounts[acc]
                 data = pd.DataFrame(index=None, columns=None)
@@ -156,6 +210,7 @@ class Account_manager:
                     data_row=53, data_col=4, label_col=2,
                     graph_width=4, graph_height=18, graph_row=51, graph_col=10
                 )
+            ## Saves file
             workbook = writer.book
             workbook.save(summary_file_path)
             workbook.close()
