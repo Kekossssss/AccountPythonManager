@@ -40,6 +40,10 @@ class Monthly_report:
     
     def build(self):
         ##TODO: Add support for csv file format
+        self.Monthly_Revenues = 0.0
+        self.Monthly_Expenses = 0.0
+        self.Monthly_Total = 0.0
+        self.Current_Balance = self.Initial_Balance
         file = pd.ExcelFile(self.Month_file_path)
         Sheet_names = file.sheet_names
         for sheet in Sheet_names:

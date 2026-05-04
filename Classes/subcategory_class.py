@@ -35,6 +35,9 @@ class Subcategory_report:
         self.Entries.append(entry)
 
     def build(self, data:pd.DataFrame, i, j):
+        self.Subtotal_revenue = 0.0
+        self.Subtotal_expense = 0.0
+        self.Subtotal = 0.0
         row = i+1
         col = j+1
         details = str(data.iloc[row].iloc[col])

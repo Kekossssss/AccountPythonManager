@@ -25,6 +25,7 @@ class Account_manager:
         self.Folder_path = os.getcwd() + '/'
         self.Reports_extension = report_format
         self.Accounts = {}
+        self.Initial_total = 0.0
         self.Total = 0.0
     
     ## CLASS DISPLAY FUNCTIONS
@@ -71,12 +72,16 @@ class Account_manager:
         assert LANGUAGE_DICT['init_account'] in folder_list, "Initialisation File is not in main folder"
         file = open(LANGUAGE_DICT['init_account'])
         line_raw = file.readline()
+        self.Initial_total = 0.0
+        self.Total = 0.0
         while line_raw != "":
             line = line_raw.split(" ")
             assert line[0] in folder_list, "One of the account does not have his folder"
             assert os.path.isdir(self.Folder_path+line[0]), "The account does not have a folder, but something else"
             acc = Account(line[0], self.Folder_path+line[0], line[1])
+            acc.build()
             self.Accounts[line[0]] = acc
+            self.Initial_total += float(line[1])
             self.Total += acc.get_balance()
             line_raw = file.readline()
 

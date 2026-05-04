@@ -18,18 +18,6 @@ class Account:
         self.Bilan = 0.0
         self.Initial_Balance = float(init_balance)
         self.Balance = float(init_balance)
-        os.chdir(path)
-        files_list = os.listdir()
-        for i in files_list:
-            path_to_folder = path + '/' + i
-            if (os.path.isdir(path_to_folder)):
-                if (int(i) not in YEARS):
-                    YEARS.append(int(i))
-                    YEARS.sort()
-        for y in YEARS:
-            if (str(y) in files_list):
-                path_to_folder = path + '/' + str(y)
-                self.build(str(y), path_to_folder)
 
     ## CLASS DISPLAY FUNCTIONS
     def display(self, depth=9, show_empty_months_message=1):
@@ -41,14 +29,28 @@ class Account:
                 self.Yearly_reports[year].display(depth - 1, show_empty_months_message=show_empty_months_message)
 
     ## CLASS FUNCTIONS
-    def build(self, year, path):
-        report = Yearly_report(year, path, init_bal=self.Balance)
-        report.build()
-        self.Yearly_reports[year] = report
-        self.Revenues += self.Yearly_reports[year].get_revenue()
-        self.Expenses += self.Yearly_reports[year].get_expense()
-        self.Bilan += self.Yearly_reports[year].get_total()
-        self.Balance = self.Yearly_reports[year].get_balance()
+    def build(self):
+        self.Revenues = 0.0
+        self.Expenses = 0.0
+        self.Bilan = 0.0
+        os.chdir(self.Account_folder_path)
+        files_list = os.listdir()
+        for i in files_list:
+            path_to_folder = self.Account_folder_path + '/' + i
+            if (os.path.isdir(path_to_folder)):
+                if (int(i) not in YEARS):
+                    YEARS.append(int(i))
+                    YEARS.sort()
+        for y in YEARS:
+            if (str(y) in files_list):
+                path_to_folder = self.Account_folder_path + '/' + str(y)
+                report = Yearly_report(str(y), path_to_folder, init_bal=self.Balance)
+                report.build()
+                self.Yearly_reports[str(y)] = report
+                self.Revenues += self.Yearly_reports[str(y)].get_revenue()
+                self.Expenses += self.Yearly_reports[str(y)].get_expense()
+                self.Bilan += self.Yearly_reports[str(y)].get_total()
+                self.Balance = self.Yearly_reports[str(y)].get_balance()
     
     def update_categories_stat(self):
         """
@@ -187,6 +189,12 @@ class Account:
     
     def get_nb_entries(self):
         return len(self.Yearly_reports.keys())
+
+    def get_revenue(self):
+        return self.Revenues
+
+    def get_expense(self):
+        return self.Expenses
 
     def get_balance(self):
         return self.Balance

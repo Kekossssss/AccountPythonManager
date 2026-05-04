@@ -29,11 +29,15 @@ class Yearly_report:
             for m in MONTHS:
                 self.Months[m].display(depth - 1, show_empty_months_message=show_empty_months_message)
             print(colored("-----------------------------------------------", attrs=['bold']))
-            print(colored(f"{LANGUAGE_DICT['initial_balance']}: {self.Initial_Balance:.2f}{LANGUAGE_DICT['currency']} | Current balance: {self.Current_Balance:.2f}{LANGUAGE_DICT['currency']}", color='red', attrs=['bold']))
+            print(colored(f"{LANGUAGE_DICT['initial_balance']}: {self.Initial_Balance:.2f}{LANGUAGE_DICT['currency']} | {LANGUAGE_DICT['actual_balance']}: {self.Current_Balance:.2f}{LANGUAGE_DICT['currency']}", color='red', attrs=['bold']))
             print(colored("-----------------------------------------------", attrs=['bold']))
     
     ## CLASS FUNCTIONS    
     def build(self):
+        self.Yearly_Revenues = 0.0
+        self.Yearly_Expenses = 0.0
+        self.Yearly_Total = 0.0
+        self.Current_Balance = self.Initial_Balance
         os.chdir(self.Year_folder_path)
         temp_file_list = os.listdir()
         temp_month_list = [i.split("_")[0] for i in temp_file_list]

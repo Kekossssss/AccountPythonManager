@@ -31,6 +31,9 @@ class Category_report:
         self.Subcategories[name] = subcategory
     
     def build(self, data:pd.DataFrame):
+        self.Category_Revenues = 0.0
+        self.Category_Expenses = 0.0
+        self.Category_Total = 0.0
         for i in range(data.__len__()):
             for j in range(1, data.iloc[i].__len__(), 6):
                 Sub = str(data.iloc[i].iloc[j]).capitalize()
