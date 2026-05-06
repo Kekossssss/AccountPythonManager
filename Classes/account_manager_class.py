@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import datetime
 from termcolor import colored
 from Utils.misc_excel_functions import *
 from Classes.account_class import Account
@@ -23,6 +24,8 @@ class Account_manager:
         self.Name = name
         os.chdir(path_to_folder)
         self.Folder_path = os.getcwd() + '/'
+        self.InitDate = None
+        self.UpdateDate = f"{datetime.datetime.now().day}/{datetime.datetime.now().month}/{datetime.datetime.now().year}"
         self.Reports_extension = report_format
         self.Accounts = {}
         self.Initial_total = 0.0
@@ -71,6 +74,11 @@ class Account_manager:
         folder_list = os.listdir()
         assert LANGUAGE_DICT['init_account'] in folder_list, "Initialisation File is not in main folder"
         file = open(LANGUAGE_DICT['init_account'])
+        line_raw = file.readline()
+        ## Grab initdate
+        line = line_raw.split(' ')
+        assert line[0] == "InitDate", "Initialisation date is not in init file"
+        self.InitDate = line[1]
         line_raw = file.readline()
         self.Initial_total = 0.0
         self.Total = 0.0
@@ -124,11 +132,11 @@ class Account_manager:
         for a in name:
             name_proper += a + " "
         data_list.insert(1, name_proper)
-        data_list.insert(3, LANGUAGE_DICT['initial_balance'])
+        data_list.insert(3, f"{LANGUAGE_DICT['initial_balance_with_date']} {self.InitDate}")
         data_list.insert(4, self.Initial_total)
         worksheet.append(data_list)
         data_list = ["" for i in range(nb_col-2)]
-        data_list.insert(3, LANGUAGE_DICT['actual_balance'])
+        data_list.insert(3, f"{LANGUAGE_DICT['actual_balance_with_date']} {self.UpdateDate}")
         data_list.insert(4, self.Total)
         worksheet.append(data_list)
         data_list = ["" for i in range(nb_col-2)]
