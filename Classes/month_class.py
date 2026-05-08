@@ -112,8 +112,8 @@ class Monthly_report:
     def fulfill_worksheet(self, worksheet, remove_null=True):
         worksheet.append(["", "", "", "", ""])
         worksheet.append(["", f"{self.Month}", "", LANGUAGE_DICT['initial_balance'], self.Initial_Balance])
-        if (int(datetime.datetime.now().month) != MONTHS.index(self.Month)):
-            worksheet.append(["", "", "", f"{LANGUAGE_DICT['balance']} 31/{MONTHS.index(self.Month)}", self.Current_Balance])
+        if (int(datetime.datetime.now().month) != (MONTHS.index(self.Month)+1)):
+            worksheet.append(["", "", "", f"{LANGUAGE_DICT['balance']} 31/{MONTHS.index(self.Month)+1}", self.Current_Balance])
         else:
             worksheet.append(["", "", "", LANGUAGE_DICT['actual_balance'], self.Current_Balance])
         worksheet.append(["", "", "", f"{LANGUAGE_DICT['evol']} (%)", ((self.Current_Balance-self.Initial_Balance)/self.Initial_Balance)])
