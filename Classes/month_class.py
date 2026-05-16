@@ -17,8 +17,10 @@ class Monthly_report:
         self.Monthly_Revenues = 0.0
         self.Monthly_Expenses = 0.0
         self.Monthly_Total = 0.0
+        self.Forecast = 0.0
         self.Initial_Balance = init_bal
         self.Current_Balance = init_bal
+        self.Expected_Balance = init_bal
 
     ## CLASS DISPLAYS
     def display(self, depth=9, show_empty_months_message=1):
@@ -28,7 +30,7 @@ class Monthly_report:
                     print(colored(f"{self.Month} {LANGUAGE_DICT['no_entries']}", color="yellow", attrs=['underline' ,'bold']))
                     print("\n")
             else:
-                print(colored(f"{self.Month}: {self.Current_Balance:.2f}{LANGUAGE_DICT['currency']} || +{self.Monthly_Revenues:.2f}{LANGUAGE_DICT['currency']} | -{self.Monthly_Expenses:.2f}{LANGUAGE_DICT['currency']} || {self.Monthly_Total:.2f}{LANGUAGE_DICT['currency']}", color="yellow", attrs=['underline', 'bold']))
+                print(colored(f"{self.Month}: {self.Current_Balance:.2f}{LANGUAGE_DICT['currency']} || +{self.Monthly_Revenues:.2f}{LANGUAGE_DICT['currency']} | -{self.Monthly_Expenses:.2f}{LANGUAGE_DICT['currency']} || {self.Monthly_Total:.2f}{LANGUAGE_DICT['currency']} || {self.Forecast:.2f}{LANGUAGE_DICT['currency']}", color="yellow", attrs=['underline', 'bold']))
                 for cat in self.Categories.keys():
                     self.Categories[cat].display(depth - 1)
                 print("\n")
@@ -37,23 +39,41 @@ class Monthly_report:
     def add_category(self, name):
         category = Category_report(name)
         self.Categories[name] = category
-    
+
+    def build_categorie_sheet(self, file):
+        for sheet in file.sheet_names:
+            if sheet != LANGUAGE_DICT['forecast']:
+                data = pd.read_excel(file, sheet_name=sheet)
+                self.add_category(sheet)
+                self.Categories[sheet].build(data)
+                self.Monthly_Revenues += self.Categories[sheet].get_revenue()
+                self.Monthly_Expenses += self.Categories[sheet].get_expense()
+                self.Monthly_Total += self.Categories[sheet].get_total()
+        self.Current_Balance += self.Monthly_Total
+
+    def build_forecast_sheet(self, file):
+        if LANGUAGE_DICT['forecast'] in file.sheet_names:
+            data = pd.read_excel(file, sheet_name=LANGUAGE_DICT['forecast'])
+            for i in range(data.__len__()):
+                for j in range(1, data.iloc[i].__len__(), 4):
+                    Sub = str(data.iloc[i].iloc[j]).capitalize()
+                    if (Sub != "Nan" and Sub in self.Categories.keys()):
+                        Cat = self.Categories[Sub]
+                        Cat.build_forecast_category(data, i, j)
+                        self.Forecast += Cat.get_forecast()
+
     def build(self):
         ##TODO: Add support for csv file format
         self.Monthly_Revenues = 0.0
         self.Monthly_Expenses = 0.0
         self.Monthly_Total = 0.0
+        self.Forecast = 0.0
         self.Current_Balance = self.Initial_Balance
+        self.Expected_Balance = self.Initial_Balance
         file = pd.ExcelFile(self.Month_file_path)
-        Sheet_names = file.sheet_names
-        for sheet in Sheet_names:
-            data = pd.read_excel(file, sheet_name=sheet)
-            self.add_category(sheet)
-            self.Categories[sheet].build(data)
-            self.Monthly_Revenues += self.Categories[sheet].get_revenue()
-            self.Monthly_Expenses += self.Categories[sheet].get_expense()
-            self.Monthly_Total += self.Categories[sheet].get_total()
-        self.Current_Balance += self.Monthly_Total
+        self.build_categorie_sheet(file=file)
+        self.build_forecast_sheet(file=file)
+        self.Expected_Balance += self.Forecast
 
     def update_categories_stat(self):
         """
@@ -62,9 +82,7 @@ class Monthly_report:
         if (self.Month_file_path == ""):
             pass
         else:
-            file = pd.ExcelFile(self.Month_file_path)
-            Sheet_names = file.sheet_names
-            for sheet in Sheet_names:
+            for sheet in self.Categories.keys():
                 revenue = float(self.Categories[sheet].get_revenue())
                 expense = float(self.Categories[sheet].get_expense())
                 total = float(self.Categories[sheet].get_total())

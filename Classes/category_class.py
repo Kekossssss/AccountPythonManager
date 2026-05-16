@@ -17,11 +17,12 @@ class Category_report:
         self.Category_Revenues = 0.0
         self.Category_Expenses = 0.0
         self.Category_Total = 0.0
+        self.Forecast = 0.0
     
     ## CLASS DISPLAYS
     def display(self, depth=9):
         if (depth >= 0):
-            print(colored(f"■ {self.Name}: +{self.Category_Revenues:.2f}{LANGUAGE_DICT['currency']} | -{self.Category_Expenses:.2f}{LANGUAGE_DICT['currency']} | {self.Category_Total:.2f}{LANGUAGE_DICT['currency']}", color='green', attrs=['bold']))
+            print(colored(f"■ {self.Name}: +{self.Category_Revenues:.2f}{LANGUAGE_DICT['currency']} | -{self.Category_Expenses:.2f}{LANGUAGE_DICT['currency']} | {self.Category_Total:.2f}{LANGUAGE_DICT['currency']} | {self.Forecast:.2f}{LANGUAGE_DICT['currency']}", color='green', attrs=['bold']))
             for sub in self.Subcategories.keys():
                 self.Subcategories[sub].display(depth - 1)
     
@@ -43,6 +44,18 @@ class Category_report:
                     self.Category_Revenues += self.Subcategories[Sub].get_revenue()
                     self.Category_Expenses += self.Subcategories[Sub].get_expense()
                     self.Category_Total += self.Subcategories[Sub].get_total()
+    
+    def build_forecast_category(self, data:pd.DataFrame, i, j):
+        row = i+1
+        col = j+1
+        details = str(data.iloc[row].iloc[col])
+        while details != LANGUAGE_DICT['total']:
+            if (details != "nan" and details in self.Subcategories.keys()):
+                if (str(data.iloc[row].iloc[col+1]) != "nan"):
+                    self.Subcategories[details].set_forecast(float(data.iloc[row].iloc[col+1]))
+                    self.Forecast += self.Subcategories[details].get_forecast()
+            row += 1
+            details = str(data.iloc[row].iloc[col])
     
     def fulfill_worksheet(self, data, remove_null=True):
         len_table = 1
@@ -72,3 +85,6 @@ class Category_report:
 
     def get_total(self):
         return self.Category_Total
+
+    def get_forecast(self):
+        return self.Forecast

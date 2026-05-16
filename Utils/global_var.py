@@ -9,6 +9,7 @@ MONTHS = []
 FRENCH = {
     'currency': "€",
     ## File strings
+    'forecast': "Previsionnel",
     'init_account': "Comptes_initialisation.txt",
     'default_user': "Moi",
     'account_report': "Rapport_Global",
@@ -51,6 +52,7 @@ FRENCH = {
 ENGLISH = {
     'currency': "£",
     ## File strings
+    'forecast': "Forecast",
     'init_account': "Account_init.txt",
     'default_user': "Me",
     'account_report': "Global_Report",
@@ -93,6 +95,7 @@ ENGLISH = {
 ENGLISH_USA = {
     'currency': "$",
     ## File strings
+    'forecast': "Forecast",
     'init_account': "Account_init.txt",
     'default_user': "Me",
     'account_report': "Global_Report",

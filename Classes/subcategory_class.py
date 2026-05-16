@@ -17,6 +17,7 @@ class Subcategory_report:
         self.Subtotal_revenue = 0.0
         self.Subtotal_expense = 0.0
         self.Subtotal = 0.0
+        self.Forecast = 0.0
     
     ## CLASS DISPLAYS
     def display(self, depth=9):
@@ -24,7 +25,7 @@ class Subcategory_report:
             if (len(self.Entries) == 0):
                 print(colored(f"\t• {self.Name} {LANGUAGE_DICT['no_entries']}", attrs=['bold']))
             else:
-                print(colored(f"\t• {self.Name} : +{self.Subtotal_revenue:.2f}{LANGUAGE_DICT['currency']} | -{self.Subtotal_expense:.2f}{LANGUAGE_DICT['currency']} | {LANGUAGE_DICT['total']}: {self.Subtotal:.2f}{LANGUAGE_DICT['currency']}", attrs=['bold']))
+                print(colored(f"\t• {self.Name} : +{self.Subtotal_revenue:.2f}{LANGUAGE_DICT['currency']} | -{self.Subtotal_expense:.2f}{LANGUAGE_DICT['currency']} | {LANGUAGE_DICT['total']}: {self.Subtotal:.2f}{LANGUAGE_DICT['currency']}  | {LANGUAGE_DICT['forecast']}: {self.Forecast:.2f}{LANGUAGE_DICT['currency']}", attrs=['bold']))
                 for entry in self.Entries:
                     entry.display(depth - 1)
     
@@ -64,3 +65,9 @@ class Subcategory_report:
 
     def get_total(self):
         return self.Subtotal
+
+    def set_forecast(self, forecast):
+        self.Forecast = forecast
+
+    def get_forecast(self):
+        return self.Forecast
