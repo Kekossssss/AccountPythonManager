@@ -101,7 +101,7 @@ class Yearly_report:
                 apply_complex_table(worksheet,
                                     start_col=2, start_row=6, width=6, height=len_table+1, col_width=25,
                                     row_title_list=[0],
-                                    col_bold_list=[0],
+                                    col_bold_list=[0, 3],
                                     col_currency_list=[1, 2, 3, 4],
                                     col_percent_list=[5],
                                     col_color_list=[3, 4, 5],
