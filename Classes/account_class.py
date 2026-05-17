@@ -21,6 +21,7 @@ class Account:
         self.Initial_Balance = float(init_balance)
         self.Balance = float(init_balance)
         self.Expected_Balance = float(init_balance)
+        self.Balance_Difference = 0.0
 
     ## CLASS DISPLAY FUNCTIONS
     def display(self, depth=9, show_empty_months_message=1):
@@ -36,6 +37,8 @@ class Account:
         self.Revenues = 0.0
         self.Expenses = 0.0
         self.Bilan = 0.0
+        self.Forecast = 0.0
+        self.Expected_Balance = self.Initial_Balance
         os.chdir(self.Account_folder_path)
         files_list = os.listdir()
         for i in files_list:
@@ -53,7 +56,13 @@ class Account:
                 self.Revenues += self.Yearly_reports[str(y)].get_revenue()
                 self.Expenses += self.Yearly_reports[str(y)].get_expense()
                 self.Bilan += self.Yearly_reports[str(y)].get_total()
+                self.Forecast += self.Yearly_reports[str(y)].get_forecast()
                 self.Balance = self.Yearly_reports[str(y)].get_balance()
+                self.Expected_Balance += self.Yearly_reports[str(y)].get_forecast()
+        if self.Forecast != 0.0 and self.Bilan != 0.0:
+            self.Difference = ((self.Bilan - self.Forecast) / abs(self.Forecast))
+        if self.Expected_Balance != 0.0 and self.Balance != 0.0:
+            self.Balance_Difference = ((self.Balance - self.Expected_Balance) / abs(self.Expected_Balance))
     
     def update_categories_stat(self):
         """
@@ -259,5 +268,20 @@ class Account:
     def get_expense(self):
         return self.Expenses
 
+    def get_bilan(self):
+        return self.Bilan
+
+    def get_forecast(self):
+        return self.Forecast
+
+    def get_difference(self):
+        return self.Difference
+
     def get_balance(self):
         return self.Balance
+
+    def get_expected_balance(self):
+        return self.Expected_Balance
+
+    def get_balance_difference(self):
+        return self.Balance_Difference

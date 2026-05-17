@@ -28,8 +28,10 @@ class Account_manager:
         self.UpdateDate = f"{datetime.datetime.now().day}/{datetime.datetime.now().month}/{datetime.datetime.now().year}"
         self.Reports_extension = report_format
         self.Accounts = {}
+        self.Forecast = 0.0
         self.Initial_total = 0.0
         self.Total = 0.0
+        self.Expected_Balance = 0.0
     
     ## CLASS DISPLAY FUNCTIONS
     def display(self, accounts=[], depth=9, accounts_depth=None, show_empty_months_message=1):
@@ -80,8 +82,10 @@ class Account_manager:
         assert line[0] == "InitDate", "Initialisation date is not in init file"
         self.InitDate = line[1]
         line_raw = file.readline()
+        self.Forecast = 0.0
         self.Initial_total = 0.0
         self.Total = 0.0
+        self.Expected_Balance = 0.0
         while line_raw != "":
             line = line_raw.split(" ")
             assert line[0] in folder_list, "One of the account does not have his folder"
@@ -89,8 +93,10 @@ class Account_manager:
             acc = Account(line[0], self.Folder_path+line[0], line[1])
             acc.build()
             self.Accounts[line[0]] = acc
+            self.Forecast += acc.get_forecast()
             self.Initial_total += float(line[1])
             self.Total += acc.get_balance()
+            self.Expected_Balance += acc.get_expected_balance()
             line_raw = file.readline()
 
     def update_categories_stat(self):
@@ -135,19 +141,28 @@ class Account_manager:
         data_list.insert(3, f"{LANGUAGE_DICT['initial_balance_with_date']} {self.InitDate}")
         data_list.insert(4, self.Initial_total)
         worksheet.append(data_list)
-        data_list = ["" for i in range(nb_col-2)]
+        data_list = ["" for i in range(nb_col-4)]
         data_list.insert(3, f"{LANGUAGE_DICT['actual_balance_with_date']} {self.UpdateDate}")
         data_list.insert(4, self.Total)
+        data_list.insert(5, LANGUAGE_DICT['balance_forecast'])
+        data_list.insert(6, self.Expected_Balance)
         worksheet.append(data_list)
-        data_list = ["" for i in range(nb_col-2)]
+        data_list = ["" for i in range(nb_col-4)]
         data_list.insert(3, f"{LANGUAGE_DICT['evol']} (%)")
         data_list.insert(4, (self.Total-self.Initial_total)/self.Initial_total)
+        data_list.insert(5, f"{LANGUAGE_DICT['evol_forecast']} (%)")
+        data_list.insert(6, (self.Expected_Balance-self.Initial_total)/self.Initial_total)
         worksheet.append(data_list)
         worksheet.append(["" for i in range(nb_col)])
         list_acc = ["", LANGUAGE_DICT['account']]
         list_revenus = ["", LANGUAGE_DICT['global_revenue']]
         list_expense = ["", LANGUAGE_DICT['global_expense']]
+        list_total = ["", LANGUAGE_DICT['total']]
+        list_forecast = ["", LANGUAGE_DICT['forecast']]
+        list_diff_forecast = ["", LANGUAGE_DICT['diff']]
         list_balance = ["", LANGUAGE_DICT['balance']]
+        list_balance_forecast = ["", LANGUAGE_DICT['balance_forecast']]
+        list_balance_diff_forecast = ["", LANGUAGE_DICT['diff']]
         for a in self.Accounts.keys():
             acc = self.Accounts[a]
             name = a.split('_')
@@ -157,12 +172,22 @@ class Account_manager:
             list_acc.append(name_proper)
             list_revenus.append(acc.get_revenue())
             list_expense.append(acc.get_expense())
+            list_total.append(acc.get_bilan())
+            list_forecast.append(acc.get_forecast())
+            list_diff_forecast.append(acc.get_difference())
             list_balance.append(acc.get_balance())
+            list_balance_forecast.append(acc.get_expected_balance())
+            list_balance_diff_forecast.append(acc.get_balance_difference())
             len_table_horizontal += 1
         worksheet.append(list_acc)
         worksheet.append(list_revenus)
         worksheet.append(list_expense)
+        worksheet.append(list_total)
+        worksheet.append(list_forecast)
+        worksheet.append(list_diff_forecast)
         worksheet.append(list_balance)
+        worksheet.append(list_balance_forecast)
+        worksheet.append(list_balance_diff_forecast)
         return len_table_horizontal
     
     def generate_accounts_summary(self, summary_file_type="xlsx"):
@@ -185,13 +210,18 @@ class Account_manager:
                                         width=2, height=3, start_row=2, start_col=4,
                                         is_last_percent=True, is_last_total=True
             )
+            apply_simple_vertical_table(worksheet,
+                                        width=2, height=2, start_row=3, start_col=6,
+                                        is_last_percent=True, is_last_total=True
+            )
             apply_complex_table(worksheet,
-                                width=len_table, height=4, start_row=6, start_col=2, start_col_width=30, col_width=50,
+                                start_row=6, start_col=2, width=len_table, height=9, col_width=50, start_col_width=30,
                                 row_title_list=[0],
-                                col_bold_list=[0],
-                                row_currency_list=[1, 2, 3, 4],
-                                row_accentuated_list=[3, 4],
-                                row_color_list=[3, 4],
+                                col_bold_list=[0], row_bold_list=[5, 8],
+                                row_currency_list=[1, 2, 3, 4, 6, 7],
+                                row_percent_list=[5, 8],
+                                row_color_list=[3, 4, 5, 6, 7, 8],
+                                row_accentuated_list=[3, 6]
             )
             ## Write per account yearly summary
             for acc in self.Accounts.keys():
