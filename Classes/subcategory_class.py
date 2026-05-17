@@ -18,6 +18,7 @@ class Subcategory_report:
         self.Subtotal_expense = 0.0
         self.Subtotal = 0.0
         self.Forecast = 0.0
+        self.Difference = 0.0
     
     ## CLASS DISPLAYS
     def display(self, depth=9):
@@ -68,6 +69,11 @@ class Subcategory_report:
 
     def set_forecast(self, forecast):
         self.Forecast = forecast
+        if self.Forecast != 0.0 and self.Subtotal != 0.0:
+            self.Difference = ((self.Subtotal - self.Forecast) / abs(self.Forecast))
 
     def get_forecast(self):
         return self.Forecast
+
+    def get_difference(self):
+        return self.Difference

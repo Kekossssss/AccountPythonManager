@@ -88,13 +88,27 @@ def apply_simple_vertical_table(worksheet, width=2, height=3, start_row=1, start
                 if i == start_row+height-1 and is_last_total:
                     if cell.value < 0.0:
                         cell.font = data_font[2]
-                    else:
+                    elif cell.value > 0.0:
                         cell.font = data_font[3]
             else:
                 cell.font = data_font[1]
 
-def worksheet_table_vertical_background(worksheet, width=2, height=3, start_row=1, start_col=1, start_col_width=30, col_width=24, is_last_total=False, is_last_col_total=False):
-    ## Apply Title Background
+def apply_complex_table(worksheet,
+                        width=2, height=3,
+                        start_col=1, start_row=1, start_col_width=30, col_width=24,
+                        col_title_list=[], row_title_list=[],
+                        col_color_list=[], row_color_list=[],
+                        col_currency_list=[], row_currency_list=[],
+                        col_percent_list=[], row_percent_list=[],
+                        col_bold_list=[], row_bold_list=[],
+                        col_accentuated_list=[], row_accentuated_list=[]):
+    ## Set Column Width
+    for j in range(start_col, start_col+width):
+        if (j == start_col):
+            worksheet.column_dimensions[get_column(j)].width = start_col_width
+        else:
+            worksheet.column_dimensions[get_column(j)].width = col_width
+    ## Generate Table Styles
     title_background = PatternFill("solid", fgColor="A0A0A0")
     title_font = Font(color="000000", bold=True, size=20)
     title_border = Border(
@@ -103,143 +117,76 @@ def worksheet_table_vertical_background(worksheet, width=2, height=3, start_row=
         top    = Side(border_style='thick', color="000000"),
         bottom = Side(border_style='thick', color="000000")
     )
-    for j in range(start_col, start_col+width):
-        cell = worksheet[compute_cell(j,start_row)]
-        cell.fill = title_background
-        cell.font = title_font
-        cell.border = title_border
-        if (j == start_col):
-            worksheet.column_dimensions[get_column(j)].width = start_col_width
-        else:
-            worksheet.column_dimensions[get_column(j)].width = col_width
-    ## Apply Values Background
-    data_background = [PatternFill("solid", fgColor="F0F0F0"), PatternFill("solid", fgColor="E0E0E0")]
-    data_font = [Font(color="000000", bold=False, size=14), Font(color="000000", bold=True, size=14), Font(color="AA0000", bold=False, size=14), Font(color="00AA00", bold=False, size=14)]
-    data_border = Border(
+    normal_background = [PatternFill("solid", fgColor="F0F0F0"), PatternFill("solid", fgColor="E0E0E0")]
+    normal_font = Font(color="000000", bold=False, size=14)
+    normal_border = Border(
         left   = Side(border_style='thick', color="000000"),
         right  = Side(border_style='thick', color="000000"),
         top    = Side(border_style='thin', color="000000"),
         bottom = Side(border_style='thin', color="000000")
     )
-    for i in range(start_row+1, start_row+height):
-        for j in range(start_col, start_col+width):
-            cell = worksheet[compute_cell(j,i)]
-            cell.fill = data_background[i%2]
-            cell.font = data_font[0]
-            cell.border = data_border
-            if (j != start_col):
-                cell.number_format = f'0.00 {LANGUAGE_DICT['currency']}'
-                if j == start_col+width-1 and is_last_col_total:
-                    if cell.value < 0.0:
-                        cell.font = data_font[2]
-                    else:
-                        cell.font = data_font[3]
-            else:
-                cell.font = data_font[1]
-    ## Apply total line styling
-    if is_last_total:
-        total_background = PatternFill("solid", fgColor="C0C0C0")
-        total_font = [Font(color="000000", bold=True, size=16), Font(color="AA0000", bold=True, size=16), Font(color="00AA00", bold=True, size=16)]
-        total_border = Border(
-            left   = Side(border_style='thick', color="000000"),
-            right  = Side(border_style='thick', color="000000"),
-            top    = Side(border_style='thick', color="000000"),
-            bottom = Side(border_style='thick', color="000000")
-        )
-        for j in range(start_col, start_col+width):
-            cell = worksheet[compute_cell(j,start_row+height-1)]
-            cell.fill = total_background
-            cell.font = total_font[0]
-            if j == start_col+width-1 and is_last_col_total:
-                if cell.value < 0.0:
-                    cell.font = total_font[1]
-                elif cell.value == 0.0:
-                    cell.font = total_font[0]
-                else:
-                    cell.font = total_font[2]
-            cell.border = total_border
-    else:
-        last_border = Border(
-            left   = Side(border_style='thick', color="000000"),
-            right  = Side(border_style='thick', color="000000"),
-            top    = Side(border_style='thin', color="000000"),
-            bottom = Side(border_style='thick', color="000000")
-        )
-        for j in range(start_col, start_col+width):
-            cell = worksheet[compute_cell(j,start_row+height-1)]
-            cell.border = last_border
-
-def worksheet_table_horizontal_background(worksheet, width=2, height=3, start_row=1, start_col=1, start_col_width=30, col_width=24, is_last_total=0):
-    ## Apply Title Background
-    title_background = PatternFill("solid", fgColor="A0A0A0")
-    title_font = Font(color="000000", bold=True, size=20)
-    title_border = Border(
+    bold_font =  Font(color="000000", bold=True, size=14)
+    color_font = [Font(color="AA0000", bold=False, size=14), Font(color="00AA00", bold=False, size=14)]
+    bold_color_font = [Font(color="AA0000", bold=True, size=14), Font(color="00AA00", bold=True, size=14)]
+    accentuated_background = PatternFill("solid", fgColor="C0C0C0")
+    accentuated_font = Font(color="000000", bold=True, size=16)
+    accentuated_font_color = [Font(color="AA0000", bold=True, size=16), Font(color="00AA00", bold=True, size=16)]
+    accentuated_border = Border(
         left   = Side(border_style='thick', color="000000"),
         right  = Side(border_style='thick', color="000000"),
         top    = Side(border_style='thick', color="000000"),
         bottom = Side(border_style='thick', color="000000")
     )
-    for j in range(start_col, start_col+width):
-        cell = worksheet[compute_cell(j,start_row)]
-        cell.fill = title_background
-        cell.font = title_font
-        cell.border = title_border
-        if (j == start_col):
-            worksheet.column_dimensions[get_column(j)].width = start_col_width
-        else:
-            worksheet.column_dimensions[get_column(j)].width = col_width
-    ## Apply Values Background
-    data_background = [PatternFill("solid", fgColor="F0F0F0"), PatternFill("solid", fgColor="E0E0E0")]
-    data_font = [Font(color="000000", bold=False, size=14), Font(color="000000", bold=True, size=16), Font(color="AA0000", bold=False, size=14), Font(color="00AA00", bold=False, size=14)]
-    data_border = Border(
-        left   = Side(border_style='thick', color="000000"),
-        right  = Side(border_style='thick', color="000000"),
-        top    = Side(border_style='thin', color="000000"),
-        bottom = Side(border_style='thin', color="000000")
-    )
-    for i in range(start_row+1, start_row+height):
+    ## Apply Table Style
+    for i in range(start_row, start_row+height):
         for j in range(start_col, start_col+width):
             cell = worksheet[compute_cell(j,i)]
-            cell.fill = data_background[i%2]
-            cell.font = data_font[0]
-            cell.border = data_border
-            if (j != start_col):
-                cell.number_format = f'0.00 {LANGUAGE_DICT['currency']}'
+            if i-start_row in row_title_list or j-start_col in col_title_list:
+                cell.fill = title_background
+                cell.font = title_font
+                cell.border = title_border
+            elif i-start_row in row_accentuated_list or j-start_col in col_accentuated_list:
+                cell.fill = accentuated_background
+                cell.font = accentuated_font
+                cell.border = accentuated_border
+                ## Number Format
+                if type(cell.value) is not str:
+                    if i-start_row in row_currency_list or j-start_col in col_currency_list:
+                        cell.number_format = f'0.00 {LANGUAGE_DICT['currency']}'
+                    elif i-start_row in row_percent_list or j-start_col in col_percent_list:
+                        cell.number_format = '0.00 %'
+                ## Cell Size
+                if type(cell.value) is not str:
+                    if i-start_row in row_color_list or j-start_col in col_color_list:
+                        if cell.value < 0.0:
+                            cell.font = accentuated_font_color[0]
+                        elif cell.value > 0.0:
+                            cell.font = accentuated_font_color[1]
             else:
-                cell.font = data_font[1]
-    ## Apply total line styling
-    if is_last_total > 0:
-        total_background = PatternFill("solid", fgColor="C0C0C0")
-        total_font = [Font(color="000000", bold=True, size=16), Font(color="AA0000", bold=True, size=16), Font(color="00AA00", bold=True, size=16)]
-        total_border = Border(
-            left   = Side(border_style='thick', color="000000"),
-            right  = Side(border_style='thick', color="000000"),
-            top    = Side(border_style='thick', color="000000"),
-            bottom = Side(border_style='thick', color="000000")
-        )
-        for i in range(1, is_last_total+1):
-            for j in range(start_col, start_col+width):
-                cell = worksheet[compute_cell(j,start_row+height-i)]
-                cell.fill = total_background
-                cell.font = total_font[0]
-                if j > start_col:
-                    if cell.value < 0.0:
-                        cell.font = total_font[1]
-                    elif cell.value == 0.0:
-                        cell.font = total_font[0]
-                    else:
-                        cell.font = total_font[2]
-                cell.border = total_border
-    else:
-        last_border = Border(
-            left   = Side(border_style='thick', color="000000"),
-            right  = Side(border_style='thick', color="000000"),
-            top    = Side(border_style='thin', color="000000"),
-            bottom = Side(border_style='thick', color="000000")
-        )
-        for j in range(start_col, start_col+width):
-            cell = worksheet[compute_cell(j,start_row+height-1)]
-            cell.border = last_border
+                cell.fill = normal_background[i%2]
+                cell.font = normal_font
+                cell.border = normal_border
+                ## Number Format
+                if type(cell.value) is not str:
+                    if i-start_row in row_currency_list or j-start_col in col_currency_list:
+                        cell.number_format = f'0.00 {LANGUAGE_DICT['currency']}'
+                    elif i-start_row in row_percent_list or j-start_col in col_percent_list:
+                        cell.number_format = '0.00 %'
+                ## Cell Size
+                if i-start_row in row_bold_list or j-start_col in col_bold_list:
+                    cell.font = bold_font
+                    if type(cell.value) is not str:
+                        if i-start_row in row_color_list or j-start_col in col_color_list:
+                            if cell.value < 0.0:
+                                cell.font = bold_color_font[0]
+                            elif cell.value > 0.0:
+                                cell.font = bold_color_font[1]
+                elif i-start_row in row_color_list or j-start_col in col_color_list:
+                    if type(cell.value) is not str:
+                        if cell.value < 0.0:
+                            cell.font = color_font[0]
+                        elif cell.value > 0.0:
+                            cell.font = color_font[1]
 
 def set_pie_charts_style(graph:PieChart):
     graph.style = 10
@@ -269,6 +216,7 @@ def set_line_chart_style(graph:LineChart, title="Revenues/Expenses", colors=[]):
             w = 0.9 , h = 0.7
         )
     )
+    used_colors = []
     if (len(colors) != len(graph.series)):
         lines_colors = ["00AA00", "AA0000"]
     else:
@@ -277,6 +225,10 @@ def set_line_chart_style(graph:LineChart, title="Revenues/Expenses", colors=[]):
         serie = graph.series[i]
         serie.smooth = False
         serie.graphicalProperties.line.solidFill = lines_colors[i]
+        if lines_colors[i] in used_colors:
+            serie.graphicalProperties.line.dashStyle = "sysDot"
+        else:
+            used_colors.append(lines_colors[i])
         if (len(graph.series) == 1):
             serie.graphicalProperties.line.solidFill = "0000AA"
     graph.title = title

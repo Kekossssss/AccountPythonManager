@@ -18,6 +18,7 @@ class Category_report:
         self.Category_Expenses = 0.0
         self.Category_Total = 0.0
         self.Forecast = 0.0
+        self.Difference = 0.0
     
     ## CLASS DISPLAYS
     def display(self, depth=9):
@@ -56,6 +57,8 @@ class Category_report:
                     self.Forecast += self.Subcategories[details].get_forecast()
             row += 1
             details = str(data.iloc[row].iloc[col])
+        if self.Forecast != 0.0 and self.Category_Total != 0.0:
+            self.Difference = ((self.Category_Total - self.Forecast) / abs(self.Forecast))
     
     def fulfill_worksheet(self, data, remove_null=True):
         len_table = 1
@@ -88,3 +91,6 @@ class Category_report:
 
     def get_forecast(self):
         return self.Forecast
+
+    def get_difference(self):
+        return self.Difference

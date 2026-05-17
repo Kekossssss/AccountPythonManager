@@ -18,9 +18,11 @@ class Monthly_report:
         self.Monthly_Expenses = 0.0
         self.Monthly_Total = 0.0
         self.Forecast = 0.0
+        self.Difference = 0.0
         self.Initial_Balance = init_bal
         self.Current_Balance = init_bal
         self.Expected_Balance = init_bal
+        self.Balance_Difference = 0.0
 
     ## CLASS DISPLAYS
     def display(self, depth=9, show_empty_months_message=1):
@@ -61,6 +63,8 @@ class Monthly_report:
                         Cat = self.Categories[Sub]
                         Cat.build_forecast_category(data, i, j)
                         self.Forecast += Cat.get_forecast()
+            if self.Forecast != 0.0 and self.Monthly_Total != 0.0:
+                self.Difference = ((self.Monthly_Total - self.Forecast) / abs(self.Forecast))
 
     def build(self):
         ##TODO: Add support for csv file format
@@ -74,6 +78,8 @@ class Monthly_report:
         self.build_categorie_sheet(file=file)
         self.build_forecast_sheet(file=file)
         self.Expected_Balance += self.Forecast
+        if self.Expected_Balance != 0.0 and self.Current_Balance != 0.0:
+            self.Balance_Difference = ((self.Current_Balance - self.Expected_Balance) / abs(self.Expected_Balance))
 
     def update_categories_stat(self):
         """
@@ -128,15 +134,15 @@ class Monthly_report:
                                 )
     
     def fulfill_worksheet(self, worksheet, remove_null=True):
-        worksheet.append(["", "", "", "", ""])
-        worksheet.append(["", f"{self.Month}", "", LANGUAGE_DICT['initial_balance'], self.Initial_Balance])
+        worksheet.append(["", "", "", "", "", "", ""])
+        worksheet.append(["", f"{self.Month}", "", LANGUAGE_DICT['initial_balance'], self.Initial_Balance, "", ""])
         if (int(datetime.datetime.now().month) != (MONTHS.index(self.Month)+1)):
-            worksheet.append(["", "", "", f"{LANGUAGE_DICT['balance']} 31/{MONTHS.index(self.Month)+1}", self.Current_Balance])
+            worksheet.append(["", "", "", f"{LANGUAGE_DICT['balance']} 31/{MONTHS.index(self.Month)+1}", self.Current_Balance, f"{LANGUAGE_DICT['balance_forecast']} 31/{MONTHS.index(self.Month)+1}", self.Expected_Balance])
         else:
-            worksheet.append(["", "", "", LANGUAGE_DICT['actual_balance'], self.Current_Balance])
-        worksheet.append(["", "", "", f"{LANGUAGE_DICT['evol']} (%)", ((self.Current_Balance-self.Initial_Balance)/self.Initial_Balance)])
-        worksheet.append(["", "", "", "", ""])
-        worksheet.append(["", LANGUAGE_DICT['cats'], LANGUAGE_DICT['revenues'], LANGUAGE_DICT['expenses'], LANGUAGE_DICT['total']])
+            worksheet.append(["", "", "", LANGUAGE_DICT['actual_balance'], self.Current_Balance, LANGUAGE_DICT['actual_balance_forecast'], self.Expected_Balance])
+        worksheet.append(["", "", "", f"{LANGUAGE_DICT['evol']} (%)", ((self.Current_Balance-self.Initial_Balance)/self.Initial_Balance), f"{LANGUAGE_DICT['evol_forecast']} (%)", ((self.Expected_Balance-self.Initial_Balance)/self.Initial_Balance)])
+        worksheet.append(["", "", "", "", "", "", ""])
+        worksheet.append(["", LANGUAGE_DICT['cats'], LANGUAGE_DICT['revenues'], LANGUAGE_DICT['expenses'], LANGUAGE_DICT['total'], LANGUAGE_DICT['forecast'], f"{LANGUAGE_DICT['diff']} (%)"])
         len_table = 1
         for cat in self.Categories.keys():
             cat_list = []
@@ -145,12 +151,14 @@ class Monthly_report:
             cat_list.append(self.Categories[cat].get_revenue())
             cat_list.append(self.Categories[cat].get_expense())
             cat_list.append(self.Categories[cat].get_total())
+            cat_list.append(self.Categories[cat].get_forecast())
+            cat_list.append(self.Categories[cat].get_difference())
             if (cat_list[2] == 0.0 and cat_list[3] == 0.0 and cat_list[4] == 0.0 and remove_null):
                 pass
             else:
                 len_table += 1
                 worksheet.append(cat_list)
-        worksheet.append(["", LANGUAGE_DICT['bilan'], self.Monthly_Revenues, self.Monthly_Expenses, self.Monthly_Total])
+        worksheet.append(["", LANGUAGE_DICT['bilan'], self.Monthly_Revenues, self.Monthly_Expenses, self.Monthly_Total, self.Forecast, self.Difference])
         return len_table
     
     ## CLASS GET FUNCTIONS
@@ -180,6 +188,18 @@ class Monthly_report:
 
     def get_total(self):
         return self.Monthly_Total
+
+    def get_forecast(self):
+        return self.Forecast
+
+    def get_difference(self):
+        return self.Difference
     
     def get_balance(self):
         return self.Current_Balance
+
+    def get_expected_balance(self):
+        return self.Expected_Balance
+
+    def get_balance_difference(self):
+        return self.Balance_Difference
