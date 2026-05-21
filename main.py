@@ -21,16 +21,14 @@ def main(args):
                 name = folder.split('/')[-1]
             my_accounts = Account_manager(folder, name=name)
         print_info(f"Account initialisation finished")
-        my_accounts.build()
-        print_info(f"Account build finished")
-        my_accounts.display(depth=args.depth, show_empty_months_message=0)
-        print_info(f"Account display finished")
         my_accounts.update(args.extension_format)
         print_info(f"Account reports update finished")
         my_accounts.generate_yearly(args.extension_format)
         print_info(f"Account yearly reports finished")
         my_accounts.generate_accounts_summary(args.extension_format)
         print_info(f"Account general report finished")
+        my_accounts.display(depth=args.depth, show_empty_months_message=0)
+        print_info(f"Account display finished")
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(prog="AccountManager", description="Programm used to parse excel file containing transaction informations accross different accounts, years, months and categories. Also allows one to see summaries and generate them using a file format of their choice.")
