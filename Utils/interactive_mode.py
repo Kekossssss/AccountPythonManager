@@ -2,6 +2,7 @@ import os
 import math
 from termcolor import colored
 from Classes.account_manager_class import Account_manager
+from Utils.global_var import YEARS
 
 ########################################################################
 ## TITLES                                                             ##
@@ -103,6 +104,18 @@ MENU = [
 ]
 MENU_HEIGHT = len(MENU)
 
+REPORTS_MENU = [
+    "Available options :",
+    "     A - Rebuilding/Updating data",
+    "     Z - Update all transaction sheets",
+    "     E - Generate monthly reports",
+    "     R - Generate yearly reports",
+    "     Q - Generate account summaries",
+    "     S - Restrain (WIP)",
+    "     D - Return to main menu"
+]
+REPORTS_MENU_HEIGHT = len(REPORTS_MENU)
+
 ########################################################################
 ## PRINT FUNCTIONS                                                    ##
 ########################################################################
@@ -174,6 +187,25 @@ def print_menu(source="Exemple/", name="Default"):
         else:
             print_menu_line(i, size)
 
+def print_reports_menu_line(i, size):
+    if i >= 5 and i - 5 < REPORTS_MENU_HEIGHT:
+        print_line(line=REPORTS_MENU[i-5], size=size)
+    else:
+        print_line(size=size)
+
+def print_reports_menu(account:Account_manager):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    size = os.get_terminal_size()
+    for i in range(size.lines-2):
+        if i == 0 or i == size.lines-3:
+            print_full_line(size=size)
+        elif i == 2:
+            print_line(f"Accounts : {[k for k in account.Accounts.keys()]}")
+        elif i == 3:
+            print_line(f"Years with data : {YEARS}")
+        else:
+            print_reports_menu_line(i, size)
+
 def print_goodbye_line(i, size):
     if i >= int(size.lines/2) - math.floor(GOODBYE_TITLESCREEN_REQUIRED_HEIGHT/2) and i < int(size.lines/2) + math.ceil(GOODBYE_TITLESCREEN_REQUIRED_HEIGHT/2):
         print_line(line=GOODBYE_TITLESCREEN[i-(int(size.lines/2) - math.floor(GOODBYE_TITLESCREEN_REQUIRED_HEIGHT/2))], size=size)
@@ -192,12 +224,34 @@ def print_goodbye():
 ########################################################################
 ## DATA SORTING FUNCTIONS                                             ##
 ########################################################################
-def assign_input(x:str):
+def assign_inputs_menu(x:str):
     x = x.capitalize()
     match x:
         case 'A' | '1':
             return "ReportGeneration"
+        case 'Z' | '2':
+            return "ReportsMenu"
         case 'T' | '5':
+            return "End"
+        case _:
+            return "Unknown"
+
+def assign_inputs_reports(x:str):
+    x = x.capitalize()
+    match x:
+        case 'A' | '1':
+            return "Rebuild"
+        case 'Z' | '2':
+            return "UpdateTransaction"
+        case 'E' | '3':
+            return "MonthlyReports"
+        case 'R' | '4':
+            return "YearlyReports"
+        case 'Q' | '5':
+            return "AccountSummaries"
+        case 'S' | '6':
+            return "Restrain"
+        case 'D' | '7':
             return "End"
         case _:
             return "Unknown"
@@ -261,10 +315,62 @@ def check_name(args, previous_wrong=False, false_characters=""):
         ##TODO: Choose one of the names (only one at a time is supported in interactive mode)
         return args.name[0]
 
-def use_option(option:str, account:Account_manager, args):
+def use_option_reports(option:str, account:Account_manager, args):
+    match option:
+        case "Rebuild":
+            print_reports_menu(account=account)
+            print_info_message("Reloading source data, please wait...")
+            account.build()
+            return False
+        case "UpdateTransaction":
+            print_reports_menu(account=account)
+            print_info_message("Updating subcategories data, please wait...")
+            account.update_categories_stat()
+            return False
+        case "MonthlyReports":
+            print_reports_menu(account=account)
+            print_info_message("Generating monthly reports, please wait...")
+            account.generate_monthly(summary_file_type=args.extension_format)
+            return False
+        case "YearlyReports":
+            print_reports_menu(account=account)
+            print_info_message("Generating yearly reports, please wait...")
+            account.generate_yearly(summary_file_type=args.extension_format)
+            return False
+        case "AccountSummaries":
+            print_reports_menu(account=account)
+            print_info_message("Generating account summaries, please wait...")
+            account.generate_accounts_summary(summary_file_type=args.extension_format)
+            return False
+        case "Restrain":
+            print_reports_menu(account=account)
+            print_info_message("Feature not yet supported")
+            return False
+        case "End":
+            return False
+        case "Unknown":
+            return True
+        case _:
+            assert False, f"UNKNOWN INPUT {option}"
+
+def reports_menu(account:Account_manager, args):
+    user_input = ""
+    option = "Start"
+    wrong_input = False
+    while option != "End":
+        print_reports_menu(account=account)
+        user_input = input_custom(f"What do you want to do ? (A, Z, E, ...){"" if not wrong_input else f" (Previous input unrecognized : {user_input})"}")
+        option = assign_inputs_reports(user_input)
+        wrong_input = use_option_reports(option=option, account=account, args=args)
+
+def use_option_menu(option:str, account:Account_manager, args):
     match option:
         case "ReportGeneration":
             generate_all_reports(account=account, args=args)
+            return False
+        case "ReportsMenu":
+            reports_menu(account=account, args=args)
+            return False
         case "End":
             return False
         case "Unknown":
@@ -291,6 +397,6 @@ def interactive_mode(args):
     while option != "End":
         print_menu(source=source, name=name)
         user_input = input_custom(f"What do you want to do ? (A, Z, E, ...){"" if not wrong_input else f" (Previous input unrecognized : {user_input})"}")
-        option = assign_input(user_input)
-        wrong_input = use_option(option=option, account=account, args=args)
+        option = assign_inputs_menu(user_input)
+        wrong_input = use_option_menu(option=option, account=account, args=args)
     print_goodbye()
