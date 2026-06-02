@@ -78,6 +78,7 @@ class Monthly_report:
         self.build_categorie_sheet(file=file)
         self.build_forecast_sheet(file=file)
         self.Expected_Balance += self.Forecast
+        self.Balance_Difference = 0.0
         if self.Expected_Balance != 0.0 and self.Current_Balance != 0.0:
             self.Balance_Difference = ((self.Current_Balance - self.Expected_Balance) / abs(self.Expected_Balance))
 

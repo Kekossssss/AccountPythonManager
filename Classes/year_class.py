@@ -45,6 +45,7 @@ class Yearly_report:
         self.Difference = 0.0
         self.Current_Balance = self.Initial_Balance
         self.Expected_Balance = self.Initial_Balance
+        self.Balance_Difference = 0.0
         os.chdir(self.Year_folder_path)
         temp_file_list = os.listdir()
         temp_month_list = [i.split("_")[0] for i in temp_file_list]
@@ -202,13 +203,15 @@ class Yearly_report:
             tot_expense = 0.0
             tot_tot = 0.0
             tot_forecast = 0.0
+            tot_diff = 0.0
             for m in MONTHS:
                 if (self.Months[m].get_entry(c) != None):
                     tot_revenue += self.Months[m].get_entry(c).get_revenue()
                     tot_expense += self.Months[m].get_entry(c).get_expense()
                     tot_tot += self.Months[m].get_entry(c).get_total()
                     tot_forecast += self.Months[m].get_entry(c).get_forecast()
-            tot_diff = ((tot_tot - tot_forecast) / abs(tot_forecast))
+            if tot_tot != 0.0 and tot_forecast != 0.0:
+                tot_diff = ((tot_tot - tot_forecast) / abs(tot_forecast))
             if not(tot_revenue == 0.0 and tot_expense == 0.0):
                 list_category.append(tot_revenue)
                 list_category.append(tot_expense)

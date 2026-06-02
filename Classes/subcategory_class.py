@@ -69,6 +69,7 @@ class Subcategory_report:
 
     def set_forecast(self, forecast):
         self.Forecast = forecast
+        self.Difference = 0.0
         if self.Forecast != 0.0 and self.Subtotal != 0.0:
             self.Difference = ((self.Subtotal - self.Forecast) / abs(self.Forecast))
 

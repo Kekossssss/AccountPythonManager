@@ -39,6 +39,7 @@ class Account:
         self.Bilan = 0.0
         self.Forecast = 0.0
         self.Expected_Balance = self.Initial_Balance
+        self.Balance_Difference = 0.0
         os.chdir(self.Account_folder_path)
         files_list = os.listdir()
         for i in files_list:
@@ -236,6 +237,7 @@ class Account:
             tot_expense = 0.0
             tot_tot = 0.0
             tot_forecast = 0.0
+            tot_diff = 0.0
             for y in YEARS:
                 if str(y) in self.Yearly_reports.keys():
                     for m in MONTHS:
@@ -245,7 +247,8 @@ class Account:
                             tot_tot += self.Yearly_reports[str(y)].Months[m].get_entry(c).get_total()
                             tot_forecast += self.Yearly_reports[str(y)].Months[m].get_entry(c).get_forecast()
                             tot_diff += self.Yearly_reports[str(y)].Months[m].get_entry(c).get_difference()
-            tot_diff = ((tot_tot - tot_forecast) / abs(tot_forecast))
+            if tot_tot != 0.0 and tot_forecast != 0.0:
+                tot_diff = ((tot_tot - tot_forecast) / abs(tot_forecast))
             if not(tot_revenue == 0.0 and tot_expense == 0.0):
                 list_category.append(tot_revenue)
                 list_category.append(tot_expense)

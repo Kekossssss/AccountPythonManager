@@ -57,6 +57,7 @@ class Category_report:
                     self.Forecast += self.Subcategories[details].get_forecast()
             row += 1
             details = str(data.iloc[row].iloc[col])
+        self.Difference = 0.0
         if self.Forecast != 0.0 and self.Category_Total != 0.0:
             self.Difference = ((self.Category_Total - self.Forecast) / abs(self.Forecast))
     
