@@ -169,12 +169,12 @@ def print_title():
             print_title_line(i, size)
 
 def print_menu_line(i, size):
-    if i >= 5 and i - 5 < MENU_HEIGHT:
-        print_line(line=MENU[i-5], size=size)
+    if i >= 7 and i - 7 < MENU_HEIGHT:
+        print_line(line=MENU[i-7], size=size)
     else:
         print_line(size=size)
 
-def print_menu(source="Exemple/", name="Default"):
+def print_menu(account:Account_manager, source="Exemple/", name="Default"):
     os.system('cls' if os.name == 'nt' else 'clear')
     size = os.get_terminal_size()
     for i in range(size.lines-2):
@@ -184,6 +184,10 @@ def print_menu(source="Exemple/", name="Default"):
             print_line(line=f"Welcome {name} !", size=size)
         elif i == 3:
             print_line(line=f"Current source folder : {source}", size=size)
+        elif i == 4:
+            print_line(line="", size=size)
+        elif i == 5:
+            print_line(line=f"Current Total Balance : {account.Total:.2f}€", size=size)
         else:
             print_menu_line(i, size)
 
@@ -264,16 +268,16 @@ def check_name_characters(name):
     return True, ""
 
 def generate_all_reports(account:Account_manager, args):
-    print_menu(source=account.Folder_path, name=account.Name)
+    print_menu(account, source=account.Folder_path, name=account.Name)
     print_info_message("Reloading source data and updating subcategories data, please wait...")
     account.update()
-    print_menu(source=account.Folder_path, name=account.Name)
+    print_menu(account, source=account.Folder_path, name=account.Name)
     print_info_message("Generating monthly reports, please wait...")
     account.generate_monthly(summary_file_type=args.extension_format)
-    print_menu(source=account.Folder_path, name=account.Name)
+    print_menu(account, source=account.Folder_path, name=account.Name)
     print_info_message("Generating yearly reports, please wait...")
     account.generate_yearly(summary_file_type=args.extension_format)
-    print_menu(source=account.Folder_path, name=account.Name)
+    print_menu(account, source=account.Folder_path, name=account.Name)
     print_info_message("Generating account summaries, please wait...")
     account.generate_accounts_summary(summary_file_type=args.extension_format)
 
@@ -395,7 +399,7 @@ def interactive_mode(args):
     option = "Start"
     wrong_input = False
     while option != "End":
-        print_menu(source=source, name=name)
+        print_menu(account, source=source, name=name)
         user_input = input_custom(f"What do you want to do ? (A, Z, E, ...){"" if not wrong_input else f" (Previous input unrecognized : {user_input})"}")
         option = assign_inputs_menu(user_input)
         wrong_input = use_option_menu(option=option, account=account, args=args)
