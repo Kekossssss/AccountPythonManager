@@ -12,6 +12,8 @@ class Subcategory_report:
     def __init__(self, name, cat):
         if name not in CATEGORIES[cat]:
             CATEGORIES[cat].append(name)
+        if name not in SUBCATEGORIES:
+            SUBCATEGORIES.append(name)
         self.Name = name
         self.Entries = []
         self.Subtotal_revenue = 0.0
