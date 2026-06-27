@@ -268,11 +268,24 @@ def update_terminal_position(position:list, position_max:list, position_level:in
 def print_line(line:str='', size=None, text_color="white"):
     if size == None:
         size = os.get_terminal_size()
-    print(colored("# ", color='magenta', attrs=['bold']), end='')
-    print(colored(line, color=text_color, attrs=['bold']), end='')
-    for _ in range(size.columns-len(line)-3):
-        print(" ", end='')
-    print(colored("#", color='magenta', attrs=['bold']))
+    ## Compute number of lines needed
+    full_line_len = len(line) + len("#  #")
+    nb_lines = round_sup(full_line_len/size.columns)
+    ## Print lines
+    current_line = 1
+    ind_str = 0
+    while current_line <= nb_lines:
+        print(colored("# ", color='magenta', attrs=['bold']), end='')
+        line_length = 2
+        while ind_str < len(line) and line_length + 1 < size.columns - 2:
+            print(colored(line[ind_str], color=text_color, attrs=['bold']), end='')
+            line_length += 1
+            ind_str += 1
+        for _ in range(size.columns-line_length-1):
+            print(" ", end='')
+        print(colored("#", color='magenta', attrs=['bold']))
+        current_line += 1
+    return nb_lines
 
 def print_full_line(size=None):
     if size == None:
@@ -345,190 +358,158 @@ def print_title():
         else:
             print_title_line(i, size)
 
-def print_menu_line(i, size):
-    if i >= 7 and i - 7 < MENU_HEIGHT:
-        print_line(line=MENU[i-7], size=size)
-    else:
-        print_line(size=size)
+def print_menu_line(lines_printed, size):
+    for i in range(len(MENU)):
+        lines_printed += print_line(line=MENU[i], size=size)
+    while lines_printed < size.lines - 3:
+        lines_printed += print_line(size=size)
+    return lines_printed
 
 def print_menu(account:Account_manager, source="Exemple/", name="Default"):
     os.system('cls' if os.name == 'nt' else 'clear')
     size = os.get_terminal_size()
-    for i in range(size.lines-2):
-        if i == 0 or i == size.lines-3:
-            print_full_line(size=size)
-        elif i == 2:
-            print_line(line=f"Welcome {name} !", size=size)
-        elif i == 3:
-            print_line(line=f"Current source folder : {source}", size=size)
-        elif i == 4:
-            print_line(line="", size=size)
-        elif i == 5:
-            print_line(line=f"Current Total Balance : {account.Total:.2f}€", size=size)
-        else:
-            print_menu_line(i, size)
+    print_full_line(size=size)
+    lines_printed = 1
+    lines_printed += print_line(f"")
+    lines_printed += print_line(line=f"Welcome {name} !", size=size)
+    lines_printed += print_line(line=f"Current source folder : {source}", size=size)
+    lines_printed += print_line(f"")
+    lines_printed += print_line(line=f"Current Total Balance : {account.Total:.2f}€", size=size)
+    lines_printed += print_line(f"")
+    lines_printed = print_menu_line(lines_printed, size)
+    print_full_line(size=size)
 
-def print_reports_menu_line(i, size):
-    if i >= 5 and i - 5 < REPORTS_MENU_HEIGHT:
-        print_line(line=REPORTS_MENU[i-5], size=size)
-    else:
-        print_line(size=size)
+def print_reports_menu_line(lines_printed, size):
+    for i in range(len(REPORTS_MENU)):
+        lines_printed += print_line(line=REPORTS_MENU[i], size=size)
+    while lines_printed < size.lines - 3:
+        lines_printed += print_line(size=size)
+    return lines_printed
 
 def print_reports_menu(account:Account_manager):
     os.system('cls' if os.name == 'nt' else 'clear')
     size = os.get_terminal_size()
-    for i in range(size.lines-2):
-        if i == 0 or i == size.lines-3:
-            print_full_line(size=size)
-        elif i == 2:
-            print_line(f"Accounts : {[k for k in account.Accounts.keys()]}")
-        elif i == 3:
-            print_line(f"Years with data : {YEARS}")
-        else:
-            print_reports_menu_line(i, size)
+    print_full_line(size=size)
+    lines_printed = 1
+    lines_printed += print_line(f"")
+    lines_printed += print_line(f"Accounts : {[k for k in account.Accounts.keys()]}")
+    lines_printed += print_line(f"Years with data : {YEARS}")
+    lines_printed += print_line(f"")
+    lines_printed = print_reports_menu_line(lines_printed, size)
+    print_full_line(size=size)
 
-def print_displayData_menu_line(i, size):
-    if i >= 5 and i - 5 < DISPLAYDATA_MENU_HEIGHT:
-        print_line(line=DISPLAYDATA_MENU[i-5], size=size)
-    else:
-        print_line(size=size)
+def print_displayData_menu_line(lines_printed, size):
+    for i in range(len(DISPLAYDATA_MENU)):
+        lines_printed += print_line(line=DISPLAYDATA_MENU[i], size=size)
+    while lines_printed < size.lines - 3:
+        lines_printed += print_line(size=size)
+    return lines_printed
 
 def print_displayData_menu(account:Account_manager):
     os.system('cls' if os.name == 'nt' else 'clear')
     size = os.get_terminal_size()
-    for i in range(size.lines-2):
-        if i == 0 or i == size.lines-3:
-            print_full_line(size=size)
-        elif i == 2:
-            print_line(f"Accounts : {[k for k in account.Accounts.keys()]}")
-        elif i == 3:
-            print_line(f"Years with data : {YEARS}")
-        else:
-            print_displayData_menu_line(i, size)
+    print_full_line(size=size)
+    lines_printed = 1
+    lines_printed += print_line(f"")
+    lines_printed += print_line(f"Accounts : {[k for k in account.Accounts.keys()]}")
+    lines_printed += print_line(f"Years with data : {YEARS}")
+    lines_printed += print_line(f"")
+    lines_printed = print_displayData_menu_line(lines_printed, size)
+    print_full_line(size=size)
 
 def print_interactive_choice_lines(lines_printed, account:Account_manager, position:list, position_level:int, keys, size):
     if len(position) >= 1 and keys[0] != None:
-        print_line(f"Account :", text_color='red', size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"Account :", text_color='red', size=size)
         lines_printed += print_highlighted_line([k for k in account.Accounts.keys()], position=position[0], size=size, activate_highlight=(position_level==0))
         if len(position) >= 2 and keys[1] != None:
-            print_line(f"Years :", text_color='red', size=size)
-            lines_printed += 1
+            lines_printed += print_line(f"Years :", text_color='red', size=size)
             lines_printed += print_highlighted_line([k for k in account.Accounts[keys[0]].Yearly_reports.keys()], position=position[1], size=size, activate_highlight=(position_level==1))
             if len(position) >= 3 and keys[2] != None:
-                print_line(f"Month :", text_color='red', size=size)
-                lines_printed += 1
+                lines_printed += print_line(f"Month :", text_color='red', size=size)
                 lines_printed += print_highlighted_line([k for k in account.Accounts[keys[0]].Yearly_reports[keys[1]].Months.keys()], position=position[2], size=size, activate_highlight=(position_level==2))
                 if len(position) >= 4 and keys[3] != None:
-                    print_line(f"Category :", text_color='red', size=size)
-                    lines_printed += 1
+                    lines_printed += print_line(f"Category :", text_color='red', size=size)
                     lines_printed += print_highlighted_line([k for k in account.Accounts[keys[0]].Yearly_reports[keys[1]].Months[keys[2]].Categories.keys()], position=position[3], size=size, activate_highlight=(position_level==3))
                     if len(position) == 5 and keys[4] != None:
-                        print_line(f"Sub-Category :", text_color='red', size=size)
-                        lines_printed += 1
+                        lines_printed += print_line(f"Sub-Category :", text_color='red', size=size)
                         lines_printed += print_highlighted_line([k for k in account.Accounts[keys[0]].Yearly_reports[keys[1]].Months[keys[2]].Categories[keys[3]].Subcategories.keys()], position=position[4], size=size, activate_highlight=(position_level==4))
     return lines_printed
 
 def print_year(lines_printed:int, manager:Account_manager, keys, size):
-    print_line(f"", size=size)
-    print_line(f"Years :", text_color='red', size=size)
-    lines_printed += 2
+    lines_printed += print_line(f"", size=size)
+    lines_printed += print_line(f"Years :", text_color='red', size=size)
     if (None in keys):
-        print_line(f"    No Yearly Data available for this Account", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"    No Yearly Data available for this Account", size=size)
     else:
         account = manager.Accounts[keys[0]]
         for k in account.Yearly_reports.keys():
             year = account.Yearly_reports[k]
-            print_line(f"    {year.Year} | {year.Yearly_Total:.2f}€ | {year.Forecast:.2f}€ | {year.Initial_Balance:.2f}€ | {year.Current_Balance:.2f}€ | {year.Expected_Balance:.2f}€")
-            lines_printed += 1
-        print_line(f"    TOTAL : {account.Bilan:.2f}€ | FORECAST : {account.Forecast:.2f}€")
-        print_line(f"    INITIAL BALANCE : {account.Initial_Balance:.2f}€ | FINAL BALANCE : {account.Balance:.2f}€ | EXPECTED BALANCE : {account.Expected_Balance:.2f}€")
-        lines_printed += 2
+            lines_printed += print_line(f"    {year.Year} | {year.Yearly_Total:.2f}€ | {year.Forecast:.2f}€ | {year.Initial_Balance:.2f}€ | {year.Current_Balance:.2f}€ | {year.Expected_Balance:.2f}€")
+        lines_printed += print_line(f"    TOTAL : {account.Bilan:.2f}€ | FORECAST : {account.Forecast:.2f}€")
+        lines_printed += print_line(f"    INITIAL BALANCE : {account.Initial_Balance:.2f}€ | FINAL BALANCE : {account.Balance:.2f}€ | EXPECTED BALANCE : {account.Expected_Balance:.2f}€")
     while lines_printed < size.lines-3:
-        print_line(f"", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"", size=size)
     return lines_printed
 
 def print_month(lines_printed:int, manager:Account_manager, keys, size):
-    print_line(f"", size=size)
-    print_line(f"Months :", text_color='red', size=size)
-    lines_printed += 2
+    lines_printed += print_line(f"", size=size)
+    lines_printed += print_line(f"Months :", text_color='red', size=size)
     if (None in keys):
-        print_line(f"    No Monthly Data available for this selection", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"    No Monthly Data available for this selection", size=size)
     else:
         year = manager.Accounts[keys[0]].Yearly_reports[keys[1]]
         for k in year.Months.keys():
             month = year.Months[k]
-            print_line(f"    {month.Month} | {month.Monthly_Total:.2f}€ | {month.Forecast:.2f}€ | {month.Initial_Balance:.2f}€ | {month.Current_Balance:.2f}€ | {month.Expected_Balance:.2f}€")
-            lines_printed += 1
-        print_line(f"    TOTAL : {year.Yearly_Total:.2f}€ | FORECAST : {year.Forecast:.2f}€")
-        print_line(f"    INITIAL BALANCE : {year.Initial_Balance:.2f}€ | FINAL BALANCE : {year.Current_Balance:.2f}€ | EXPECTED BALANCE : {year.Expected_Balance:.2f}€")
-        lines_printed += 2
+            lines_printed += print_line(f"    {month.Month} | {month.Monthly_Total:.2f}€ | {month.Forecast:.2f}€ | {month.Initial_Balance:.2f}€ | {month.Current_Balance:.2f}€ | {month.Expected_Balance:.2f}€")
+        lines_printed += print_line(f"    TOTAL : {year.Yearly_Total:.2f}€ | FORECAST : {year.Forecast:.2f}€")
+        lines_printed += print_line(f"    INITIAL BALANCE : {year.Initial_Balance:.2f}€ | FINAL BALANCE : {year.Current_Balance:.2f}€ | EXPECTED BALANCE : {year.Expected_Balance:.2f}€")
     while lines_printed < size.lines-3:
-        print_line(f"", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"", size=size)
     return lines_printed
 
 def print_categories(lines_printed:int, manager:Account_manager, keys, size):
-    print_line(f"", size=size)
-    print_line(f"Categories :", text_color='red', size=size)
-    lines_printed += 2
+    lines_printed += print_line(f"", size=size)
+    lines_printed += print_line(f"Categories :", text_color='red', size=size)
     if (None in keys):
-        print_line(f"    No Categories available for this selection", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"    No Categories available for this selection", size=size)
     else:
         month = manager.Accounts[keys[0]].Yearly_reports[keys[1]].Months[keys[2]]
         for k in month.Categories.keys():
             category = month.Categories[k]
-            print_line(f"    {category.Name} | {category.Category_Total:.2f}€ | {category.Forecast:.2f}€")
-            lines_printed += 1
-        print_line(f"    TOTAL : {month.Monthly_Total:.2f}€ | FORECAST : {month.Forecast:.2f}€")
-        print_line(f"    INITIAL BALANCE : {month.Initial_Balance:.2f}€ | FINAL BALANCE : {month.Current_Balance:.2f}€ | EXPECTED BALANCE : {month.Expected_Balance:.2f}€")
-        lines_printed += 2
+            lines_printed += print_line(f"    {category.Name} | {category.Category_Total:.2f}€ | {category.Forecast:.2f}€")
+        lines_printed += print_line(f"    TOTAL : {month.Monthly_Total:.2f}€ | FORECAST : {month.Forecast:.2f}€")
+        lines_printed += print_line(f"    INITIAL BALANCE : {month.Initial_Balance:.2f}€ | FINAL BALANCE : {month.Current_Balance:.2f}€ | EXPECTED BALANCE : {month.Expected_Balance:.2f}€")
     while lines_printed < size.lines-3:
-        print_line(f"", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"", size=size)
     return lines_printed
 
 def print_subcategories(lines_printed:int, manager:Account_manager, keys, size):
-    print_line(f"", size=size)
-    print_line(f"Sub-Categories :", text_color='red', size=size)
-    lines_printed += 2
+    lines_printed += print_line(f"", size=size)
+    lines_printed += print_line(f"Sub-Categories :", text_color='red', size=size)
     if (None in keys):
-        print_line(f"    No Sub-Categories available for this selection", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"    No Sub-Categories available for this selection", size=size)
     else:
         category = manager.Accounts[keys[0]].Yearly_reports[keys[1]].Months[keys[2]].Categories[keys[3]]
         for k in category.Subcategories.keys():
             subcategory = category.Subcategories[k]
-            print_line(f"    {subcategory.Name} | {subcategory.Subtotal:.2f}€ | {subcategory.Forecast:.2f}€")
-            lines_printed += 1
-        print_line(f"    TOTAL : {category.Category_Total:.2f}€ | FORECAST : {category.Forecast:.2f}€")
-        lines_printed += 1
+            lines_printed += print_line(f"    {subcategory.Name} | {subcategory.Subtotal:.2f}€ | {subcategory.Forecast:.2f}€")
+        lines_printed += print_line(f"    TOTAL : {category.Category_Total:.2f}€ | FORECAST : {category.Forecast:.2f}€")
     while lines_printed < size.lines-3:
-        print_line(f"", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"", size=size)
     return lines_printed
 
 def print_transactions(lines_printed:int, manager:Account_manager, keys, size):
-    print_line(f"", size=size)
-    print_line(f"Transactions :", text_color='red', size=size)
-    lines_printed += 2
+    lines_printed += print_line(f"", size=size)
+    lines_printed += print_line(f"Transactions :", text_color='red', size=size)
     if (None in keys):
-        print_line(f"    No transaction data available for this selection", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"    No transaction data available for this selection", size=size)
     else:
         subcategory = manager.Accounts[keys[0]].Yearly_reports[keys[1]].Months[keys[2]].Categories[keys[3]].Subcategories[keys[4]]
         for e in subcategory.Entries:
-            print_line(f"    {e.Name} | {e.Date} | {e.Total:.2f}€")
-            lines_printed += 1
-        print_line(f"    TOTAL : {subcategory.Subtotal:.2f}€ | FORECAST : {subcategory.Forecast:.2f}€")
-        lines_printed += 1
+            lines_printed += print_line(f"    {e.Name} | {e.Date} | {e.Total:.2f}€")
+        lines_printed += print_line(f"    TOTAL : {subcategory.Subtotal:.2f}€ | FORECAST : {subcategory.Forecast:.2f}€")
     while lines_printed < size.lines-3:
-        print_line(f"", size=size)
-        lines_printed += 1
+        lines_printed += print_line(f"", size=size)
     return lines_printed
 
 def print_interactive_choice_data(lines_printed:int, manager:Account_manager, position:list, keys, size):
@@ -775,6 +756,8 @@ def use_option_displayData(option:str, account:Account_manager, args):
             while input_key != 'enter':
                 keys, position_max = update_keys(account, position)
                 position, position_level = print_interactive_choice_menu(account, position, position_max, position_level, keys)
+            return False
+        case "Account":
             return False
         case "DataQueries":
             return False
