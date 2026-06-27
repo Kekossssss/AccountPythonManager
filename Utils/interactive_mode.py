@@ -288,18 +288,28 @@ def print_highlighted_line(elements:list, size=None, position:int=None, activate
     full_line_len = len_str_list(elements, inter_str_char=" - ") + len("#  #")
     nb_lines = round_sup(full_line_len/size.columns)
     ## Print lines
-    print(colored("# ", color='magenta', attrs=['bold']), end='')
-    for i in range(0, len(elements)):
-        if position == i:
-            if activate_highlight:
-                print(colored(elements[i], color='white', on_color='on_light_magenta', attrs=['bold']), end='')
+    current_line = 1
+    ind_element = 0
+    while current_line <= nb_lines:
+        print(colored("# ", color='magenta', attrs=['bold']), end='')
+        line_length = 2
+        while ind_element < len(elements) and line_length + len(elements[ind_element]) + len(" - ") < size.columns - 2:
+            if position == ind_element:
+                if activate_highlight:
+                    print(colored(elements[ind_element], color='white', on_color='on_light_magenta', attrs=['bold']), end='')
+                else:
+                    print(colored(elements[ind_element], color='white', on_color='on_dark_grey', attrs=['bold']), end='')
             else:
-                print(colored(elements[i], color='white', on_color='on_dark_grey', attrs=['bold']), end='')
-        else:
-            print(colored(elements[i], color='white', attrs=['bold']), end='')
-        if i != len(elements)-1:
-            print(colored(" - ", color='white', attrs=['bold']), end='')
-    print(colored("#", color='magenta', attrs=['bold']))
+                print(colored(elements[ind_element], color='white', attrs=['bold']), end='')
+            line_length += len(elements[ind_element])
+            if ind_element != len(elements)-1:
+                print(colored(" - ", color='white', attrs=['bold']), end='')
+                line_length += len(" - ")
+            ind_element += 1
+        for _ in range(size.columns - line_length - 1):
+            print(colored(" ", color='magenta', attrs=['bold']), end='')
+        print(colored("#", color='magenta', attrs=['bold']))
+        current_line += 1
     return nb_lines
 
 def print_info_message(line):
