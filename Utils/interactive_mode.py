@@ -786,10 +786,12 @@ def use_option_displayData(option:str, account:Account_manager, args):
             assert False, f"UNKNOWN INPUT {option}"
 
 def displayData_menu(account:Account_manager, args):
+    global input_key
     user_input = ""
     option = "Start"
     wrong_input = False
     while option != "End":
+        input_key = ""
         print_displayData_menu(account=account)
         user_input = input_custom(f"What do you want to do ? (A, Z, E, ...){"" if not wrong_input else f" (Previous input unrecognized : {user_input})"}")
         option = assign_inputs_displayData(user_input)
