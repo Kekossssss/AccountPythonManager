@@ -36,13 +36,13 @@ def compute_cell(i, j):
 #############################################################
 ## GENERAL FUNCTIONS                                       ##
 #############################################################
-def apply_worksheet_background(worksheet, max_row = 100, max_col=100):
+def apply_worksheet_background(worksheet, max_row = 100, max_col=100, start_row=1, start_col=0, color="FFFFFF"):
     worksheet.page_setup.fitToHeight = 1
     worksheet.page_setup.fitToWidth = 1
     ## Apply white background
-    pf = PatternFill("solid", fgColor="FFFFFF")
-    for i in range(1, max_row):
-        for j in range(0, max_col):
+    pf = PatternFill("solid", fgColor=color)
+    for i in range(start_row, start_row+max_row):
+        for j in range(start_col, start_col+max_col):
             cell = worksheet[compute_cell(j,i)]
             cell.fill = pf
 

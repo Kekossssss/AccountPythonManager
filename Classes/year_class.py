@@ -94,7 +94,7 @@ class Yearly_report:
                 data = pd.DataFrame(index=None, columns=None)
                 data.to_excel(writer, sheet_name=f"{m}", index=False, header=False, float_format="%.2f")
                 worksheet = writer.sheets[f"{m}"]
-                len_table = month.fulfill_worksheet(worksheet)
+                len_table, len_subcat_tables = month.fulfill_worksheet(worksheet)
                 apply_worksheet_background(worksheet)
                 apply_case_style(worksheet, row=2, col=2)
                 apply_simple_vertical_table(worksheet, width=2, height=3, start_row=2, start_col=4, is_last_percent=True, is_last_total=True)
@@ -120,8 +120,21 @@ class Yearly_report:
                     title=LANGUAGE_DICT['expenses'], 
                     len_table=len_table, 
                     data_row=6, data_col=4, label_col=2, 
-                    graph_width=8, graph_height=18, graph_row=19, graph_col=8
-                )  
+                    graph_width=8, graph_height=18, graph_row=1, graph_col=16
+                )
+                apply_worksheet_background(worksheet, max_row=1, max_col=100, start_row=max(21, len_table+8), start_col=0, color="A0A0A0")
+                current_row = max(21, len_table+8) + 2
+                for i in range(len(len_subcat_tables)):
+                    apply_complex_table(worksheet,
+                                        start_col=2, start_row=current_row, width=6, height=len_subcat_tables[i]+1, col_width=25,
+                                        row_title_list=[0],
+                                        col_bold_list=[0, 3],
+                                        col_currency_list=[1, 2, 3, 4],
+                                        col_percent_list=[5],
+                                        col_color_list=[3, 4, 5],
+                                        row_accentuated_list=[len_subcat_tables[i]]
+                    )
+                    current_row += len_subcat_tables[i] + 2
         workbook = writer.book
         workbook.save(summary_file_path)
         workbook.close()  

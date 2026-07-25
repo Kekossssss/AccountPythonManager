@@ -74,6 +74,26 @@ class Category_report:
                 len_table += 1
                 data.append(sub_list)
         return len_table
+
+    def fulfill_worksheet_full(self, worksheet, remove_null=True):
+        len_table = 1
+        worksheet.append(["", self.Name, LANGUAGE_DICT['revenues'], LANGUAGE_DICT['expenses'], LANGUAGE_DICT['total'], LANGUAGE_DICT['forecast'], f"{LANGUAGE_DICT['diff']} (%)"])
+        for sub in self.Subcategories.keys():
+            sub_list = []
+            sub_list.append("")
+            sub_list.append(sub)
+            sub_list.append(self.Subcategories[sub].get_revenue())
+            sub_list.append(self.Subcategories[sub].get_expense())
+            sub_list.append(self.Subcategories[sub].get_total())
+            sub_list.append(self.Subcategories[sub].get_forecast())
+            sub_list.append(self.Subcategories[sub].get_difference())
+            if (sub_list[2] == 0.0 and sub_list[3] == 0.0 and sub_list[4] == 0.0 and remove_null):
+                pass
+            else:
+                len_table += 1
+                worksheet.append(sub_list)
+        worksheet.append(["", LANGUAGE_DICT['bilan'], self.Category_Revenues, self.Category_Expenses, self.Category_Total, self.Forecast, self.Difference])
+        return len_table
     
     def get_name(self):
         return self.Name
