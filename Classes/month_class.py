@@ -160,7 +160,7 @@ class Monthly_report:
                 len_table += 1
                 worksheet.append(cat_list)
         worksheet.append(["", LANGUAGE_DICT['bilan'], self.Monthly_Revenues, self.Monthly_Expenses, self.Monthly_Total, self.Forecast, self.Difference])
-        for i in range(len_table+6, max(21, len_table+8)):
+        for _ in range(len_table+6, max(21, len_table+8)):
             worksheet.append(["", "", "", "", "", "", ""])
         len_subcat_tables = []
         for cat in self.Categories.keys():

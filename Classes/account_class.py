@@ -92,8 +92,8 @@ class Account:
                 data = pd.DataFrame(index=None, columns=None)
                 data.to_excel(writer, sheet_name=f"{y}", index=False, header=False, float_format="%.2f")
                 worksheet = writer.sheets[f"{y}"]
-                len_table1, len_table2 = year.fulfill_worksheet(worksheet)
-                apply_worksheet_background(worksheet)
+                len_table1, len_table2, len_subcat_tables = year.fulfill_worksheet(worksheet)
+                apply_worksheet_background(worksheet, max_row=300)
                 apply_case_style(worksheet, row=2, col=2)
                 apply_simple_vertical_table(worksheet,
                                             width=2, height=3, start_row=2, start_col=4,
@@ -120,15 +120,6 @@ class Account:
                                     row_color_list=[3, 4, 5, 6, 7, 8],
                                     row_accentuated_list=[3, 6]
                 )
-                apply_complex_table(worksheet,
-                                    width=6, height=len_table2,
-                                    start_row=77, start_col=2,
-                                    row_title_list=[0],
-                                    col_bold_list=[0, 3],
-                                    col_currency_list=[1, 2, 3, 4],
-                                    col_percent_list=[5],
-                                    col_color_list=[3, 4, 5]
-                )
                 generate_line_chart(
                     worksheet, title=f"{LANGUAGE_DICT['revenues']}/{LANGUAGE_DICT['expenses']}", len_table=len_table1, nb_lines=2,
                     label_row=6, data_row=7, data_col=2,
@@ -146,16 +137,39 @@ class Account:
                     graph_row=55, graph_col=1, graph_height=20, graph_width=13,
                     colors=["FF8000", "FF8000"]
                 )
+                apply_complex_table(worksheet,
+                                    width=6, height=len_table2,
+                                    start_row=77, start_col=2,
+                                    row_title_list=[0],
+                                    col_bold_list=[0, 3],
+                                    col_currency_list=[1, 2, 3, 4],
+                                    col_percent_list=[5],
+                                    col_color_list=[3, 4, 5],
+                                    row_accentuated_list=[len_table2-1]
+                )
                 generate_pie_chart(
-                    worksheet, title=LANGUAGE_DICT['revenue_per_cat'], len_table=len_table2,
+                    worksheet, title=LANGUAGE_DICT['revenue_per_cat'], len_table=len_table2-1,
                     data_row=77, data_col=3, label_col=2,
                     graph_width=3, graph_height=18, graph_row=75, graph_col=8
                 )
                 generate_pie_chart(
-                    worksheet, title=LANGUAGE_DICT['expense_per_cat'], len_table=len_table2,
+                    worksheet, title=LANGUAGE_DICT['expense_per_cat'], len_table=len_table2-1,
                     data_row=77, data_col=4, label_col=2,
                     graph_width=3, graph_height=18, graph_row=75, graph_col=11
                 )
+                apply_worksheet_background(worksheet, max_row=1, max_col=100, start_row=max(95, len_table2+78), start_col=0, color="A0A0A0")
+                current_row = max(95, len_table2+78) + 2
+                for i in range(len(len_subcat_tables)):
+                    apply_complex_table(worksheet,
+                                        start_col=2, start_row=current_row, width=6, height=len_subcat_tables[i], col_width=25,
+                                        row_title_list=[0],
+                                        col_bold_list=[0, 3],
+                                        col_currency_list=[1, 2, 3, 4],
+                                        col_percent_list=[5],
+                                        col_color_list=[3, 4, 5],
+                                        row_accentuated_list=[len_subcat_tables[i]-1]
+                    )
+                    current_row += len_subcat_tables[i] + 1
             workbook = writer.book
             workbook.save(summary_file_path)
             workbook.close()

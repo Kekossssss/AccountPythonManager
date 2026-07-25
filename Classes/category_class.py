@@ -101,6 +101,12 @@ class Category_report:
     def get_nb_entries(self):
         return len(self.Subcategories.keys())
 
+    def get_entry(self, key):
+        if (key in self.Subcategories.keys()):
+            return self.Subcategories[key]
+        else:
+            return None
+
     def get_revenue(self):
         return self.Category_Revenues
 
