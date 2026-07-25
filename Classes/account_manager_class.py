@@ -106,20 +106,19 @@ class Account_manager:
         for acc in self.Accounts.keys():
             self.Accounts[acc].update_categories_stat()
 
+    def update(self):
+        """
+        Function used to update the dictionnary of accounts present in the user's budget folder as well as all of the files with metrics.
+        """
+        self.build()
+        self.update_categories_stat()
+
     def generate_monthly(self, summary_file_type="xlsx"):
         """
         Function that generates complete monthly summary with all available data
         """
         for acc in self.Accounts.keys():
             self.Accounts[acc].generate_monthly(summary_file_type=summary_file_type)
-
-    def update(self, summary_file_type="xlsx"):
-        """
-        Function used to update the dictionnary of accounts present in the user's budget folder as well as all of the files with metrics.
-        """
-        self.build()
-        self.update_categories_stat()
-        self.generate_monthly(summary_file_type=summary_file_type)
 
     def generate_yearly(self, summary_file_type="xlsx"):
         """
