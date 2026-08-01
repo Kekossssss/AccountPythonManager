@@ -126,12 +126,12 @@ class Yearly_report:
                 current_row = max(21, len_table+8) + 2
                 for i in range(len(len_subcat_tables)):
                     apply_complex_table(worksheet,
-                                        start_col=2, start_row=current_row, width=6, height=len_subcat_tables[i]+1, col_width=25,
+                                        start_col=2, start_row=current_row, width=7, height=len_subcat_tables[i]+1, col_width=25,
                                         row_title_list=[0],
                                         col_bold_list=[0, 3],
-                                        col_currency_list=[1, 2, 3, 4],
-                                        col_percent_list=[5],
-                                        col_color_list=[3, 4, 5],
+                                        col_currency_list=[1, 2, 3, 4, 5],
+                                        col_percent_list=[6],
+                                        col_color_list=[3, 4, 5, 6],
                                         row_accentuated_list=[len_subcat_tables[i]]
                     )
                     current_row += len_subcat_tables[i] + 2
@@ -247,13 +247,14 @@ class Yearly_report:
                     inside = True
             if inside:
                 worksheet.append(["", "", "", "", "", "", ""])
-                worksheet.append(["", c, LANGUAGE_DICT['revenues'], LANGUAGE_DICT['expenses'], LANGUAGE_DICT['total'], LANGUAGE_DICT['forecast'], LANGUAGE_DICT['diff']])
+                worksheet.append(["", c, LANGUAGE_DICT['revenues'], LANGUAGE_DICT['expenses'], LANGUAGE_DICT['total'], LANGUAGE_DICT['forecast'], f"{LANGUAGE_DICT['diff']} ({LANGUAGE_DICT['currency']})", f"{LANGUAGE_DICT['diff']} (%)"])
                 len_sub      = 1
                 tot_revenue  = 0.0
                 tot_expense  = 0.0
                 tot_tot      = 0.0
                 tot_forecast = 0.0
                 tot_diff     = 0.0
+                tot_diff_per = 0.0
                 for s in CATEGORIES[c]:
                     list_sub        = ["", s]
                     subtot_revenue  = 0.0
@@ -261,6 +262,7 @@ class Yearly_report:
                     subtot_tot      = 0.0
                     subtot_forecast = 0.0
                     subtot_diff     = 0.0
+                    subtot_diff_per = 0.0
                     for m in MONTHS:
                         if (self.Months[m].get_entry(c) != None):
                             if (self.Months[m].Categories[c].get_entry(s) != None):
@@ -269,13 +271,15 @@ class Yearly_report:
                                 subtot_tot      += self.Months[m].Categories[c].get_entry(s).get_total()
                                 subtot_forecast += self.Months[m].Categories[c].get_entry(s).get_forecast()
                     if subtot_tot != 0.0 and subtot_forecast != 0.0:
-                        subtot_diff = ((subtot_tot - subtot_forecast) / abs(subtot_forecast))
+                        subtot_diff = subtot_tot - subtot_forecast
+                        subtot_diff_per = ((subtot_tot - subtot_forecast) / abs(subtot_forecast))
                     if not(subtot_revenue == 0.0 and subtot_expense == 0.0):
                         list_sub.append(subtot_revenue)
                         list_sub.append(subtot_expense)
                         list_sub.append(subtot_tot)
                         list_sub.append(subtot_forecast)
                         list_sub.append(subtot_diff)
+                        list_sub.append(subtot_diff_per)
                         worksheet.append(list_sub)
                         len_sub += 1
                     tot_revenue  += subtot_revenue
@@ -283,8 +287,9 @@ class Yearly_report:
                     tot_tot      += subtot_tot
                     tot_forecast += subtot_forecast
                 if tot_tot != 0.0 and tot_forecast != 0.0:
-                    tot_diff = ((tot_tot - tot_forecast) / abs(tot_forecast))
-                worksheet.append(["", LANGUAGE_DICT['bilan'], tot_revenue, tot_expense, tot_tot, tot_forecast, tot_diff])
+                    tot_diff = tot_tot - tot_forecast
+                    tot_diff_per = ((tot_tot - tot_forecast) / abs(tot_forecast))
+                worksheet.append(["", LANGUAGE_DICT['bilan'], tot_revenue, tot_expense, tot_tot, tot_forecast, tot_diff, tot_diff_per])
                 len_sub += 1
                 len_tables_subcategories.append(len_sub)
         return len_table_horizontal, len_table_vertical, len_tables_subcategories
