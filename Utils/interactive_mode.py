@@ -582,10 +582,12 @@ def assign_inputs_reports(x:str):
         case 'R' | '4':
             return "YearlyReports"
         case 'Q' | '5':
-            return "AccountSummaries"
+            return "YearlyGlobalReports"
         case 'S' | '6':
-            return "Restrain"
+            return "AccountSummaries"
         case 'D' | '7':
+            return "Restrain"
+        case 'F' | '8':
             return "End"
         case _:
             return "Unknown"
@@ -629,6 +631,9 @@ def generate_all_reports(account:Account_manager, args):
     print_menu(account, source=account.Folder_path, name=account.Name)
     print_info_message("Generating yearly reports, please wait...")
     account.generate_yearly(summary_file_type=args.extension_format)
+    print_menu(account, source=account.Folder_path, name=account.Name)
+    print_info_message("Generating yearly global reports, please wait...")
+    account.generate_global_yearly(summary_file_type=args.extension_format)
     print_menu(account, source=account.Folder_path, name=account.Name)
     print_info_message("Generating account summaries, please wait...")
     account.generate_accounts_summary(summary_file_type=args.extension_format)
@@ -692,6 +697,11 @@ def use_option_reports(option:str, account:Account_manager, args):
             print_reports_menu(account=account)
             print_info_message("Generating yearly reports, please wait...")
             account.generate_yearly(summary_file_type=args.extension_format)
+            return False
+        case "YearlyGlobalReports":
+            print_reports_menu(account=account)
+            print_info_message("Generating yearly global reports, please wait...")
+            account.generate_global_yearly(summary_file_type=args.extension_format)
             return False
         case "AccountSummaries":
             print_reports_menu(account=account)

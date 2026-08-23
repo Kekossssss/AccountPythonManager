@@ -31,6 +31,8 @@ def main(args):
             print_info(f"Account monthly reports finished")
             my_accounts.generate_yearly(args.extension_format)
             print_info(f"Account yearly reports finished")
+            my_accounts.generate_global_yearly(args.extension_format)
+            print_info(f"Account yearly global reports finished")
             my_accounts.generate_accounts_summary(args.extension_format)
             print_info(f"Account general report finished")
             my_accounts.display(depth=args.depth, show_empty_months_message=0)
