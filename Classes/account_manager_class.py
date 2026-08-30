@@ -524,8 +524,8 @@ class Account_manager:
                                         subtot_expense  += current_year_report.Months[m].Categories[c].get_entry(s).get_expense()
                                         subtot_tot      += current_year_report.Months[m].Categories[c].get_entry(s).get_total()
                                         subtot_forecast += current_year_report.Months[m].Categories[c].get_entry(s).get_forecast()
+                    subtot_diff = subtot_tot - subtot_forecast
                     if subtot_tot != 0.0 and subtot_forecast != 0.0:
-                        subtot_diff = subtot_tot - subtot_forecast
                         subtot_diff_per = ((subtot_tot - subtot_forecast) / abs(subtot_forecast))
                     if not(subtot_revenue == 0.0 and subtot_expense == 0.0):
                         list_sub.append(subtot_revenue)
@@ -540,8 +540,8 @@ class Account_manager:
                     tot_expense  += subtot_expense
                     tot_tot      += subtot_tot
                     tot_forecast += subtot_forecast
+                tot_diff = tot_tot - tot_forecast
                 if tot_tot != 0.0 and tot_forecast != 0.0:
-                    tot_diff = tot_tot - tot_forecast
                     tot_diff_per = ((tot_tot - tot_forecast) / abs(tot_forecast))
                 worksheet.append(["", LANGUAGE_DICT['bilan'], tot_revenue, tot_expense, tot_tot, tot_forecast, tot_diff, tot_diff_per])
                 len_sub += 1
